@@ -1,0 +1,12 @@
+[project]
+name = "nutrichatbot"
+version = "0.1.0"
+description = "Chatbot Asisten Gizi & Resep Sehat dengan RAG"
+dependencies = [
+  "streamlit",
+  "pandas",
+  "google-generativeai",
+  "python-dotenv",
+  "chromadb",
+  "google-genai>=1.20.0",
+]
