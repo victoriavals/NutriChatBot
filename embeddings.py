@@ -1,3 +1,4 @@
+# embeddings.py
 """
 This module handles Chroma DB initialization and RAG (retrieval-augmented generation)
 functionality for the NutriChatBot.
@@ -8,6 +9,10 @@ from chromadb.utils import embedding_functions
 import pandas as pd
 import google.generativeai as genai
 import os
+from dotenv import load_dotenv # <-- TAMBAHKAN BARIS INI
+
+# Load environment variables early for this module
+load_dotenv() # <-- TAMBAHKAN PANGGILAN FUNGSI INI
 
 # Initialize Google Generative AI embedding function
 # Make sure GEMINI_API_KEY is loaded in the environment
@@ -15,7 +20,6 @@ try:
     _gemini_ef = embedding_functions.GoogleGenerativeAiEmbeddingFunction(api_key=os.environ["GEMINI_API_KEY"])
 except KeyError:
     raise EnvironmentError("GEMINI_API_KEY not found. Please set it in your .env file or environment variables.")
-
 
 def get_chroma_client():
     """
@@ -31,7 +35,7 @@ def index_nutrition_data(df: pd.DataFrame, client: chromadb.PersistentClient):
     in Chroma DB.
     """
     collection_name = "nutrition"
-    
+
     # Check if collection exists and delete if it does to re-index
     try:
         client.delete_collection(name=collection_name)
