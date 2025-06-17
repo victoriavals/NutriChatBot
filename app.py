@@ -96,7 +96,7 @@ with st.sidebar:
         "Alternatif Sehat"
     ])
     st.markdown("---")
-    st.write("Dibuat dengan ❤️ oleh Anda") # Placeholder for author/info
+    st.write("By Naufal Firdaus")
 
 conn = get_db_connection()
 
@@ -164,7 +164,7 @@ elif menu_selection == "Perencana Menu Mingguan":
                 """
                 try:
                     chat = gemini_model.start_chat(history=[])
-                    response = chat.send_message(menu_prompt, generation_config={"temperature": 0.2, "max_output_tokens": 512})
+                    response = chat.send_message(menu_prompt, generation_config={"temperature": 0.2, "max_output_tokens": 2048})
                     st.write("---")
                     st.subheader("Rencana Menu Mingguan Anda:")
                     st.write(response.text)
