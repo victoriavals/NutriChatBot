@@ -1,25 +1,34 @@
-# embeddings.py
 """
 This module handles Chroma DB initialization and RAG (retrieval-augmented generation)
 functionality for the NutriChatBot.
 """
+
+import sys
+# --- Force pysqlite3 usage before chromadb import ---
+# This is a common workaround for systems with older default sqlite3 libraries
+try:
+    __import__("pysqlite3")
+    sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
+except ImportError:
+    # If pysqlite3 is not available (e.g., local dev without it),
+    # then fallback to the default sqlite3.
+    # On Streamlit Cloud, pysqlite3-binary should be installed, so this won't be hit.
+    pass
+# --- End of pysqlite3 force ---
+
 
 import chromadb
 from chromadb.utils import embedding_functions
 import pandas as pd
 import google.generativeai as genai
 import os
-from dotenv import load_dotenv # <-- TAMBAHKAN BARIS INI
-
-# Load environment variables early for this module
-load_dotenv() # <-- TAMBAHKAN PANGGILAN FUNGSI INI
-
-# Initialize Google Generative AI embedding function
-# Make sure GEMINI_API_KEY is loaded in the environment
+from dotenv import load_dotenv
+load_dotenv() 
 try:
     _gemini_ef = embedding_functions.GoogleGenerativeAiEmbeddingFunction(api_key=os.environ["GEMINI_API_KEY"])
 except KeyError:
     raise EnvironmentError("GEMINI_API_KEY not found. Please set it in your .env file or environment variables.")
+
 
 def get_chroma_client():
     """
@@ -35,17 +44,17 @@ def index_nutrition_data(df: pd.DataFrame, client: chromadb.PersistentClient):
     in Chroma DB.
     """
     collection_name = "nutrition"
-
+    
     # Check if collection exists and delete if it does to re-index
     try:
         client.delete_collection(name=collection_name)
     except Exception:
         pass # Collection does not exist, safe to create
 
-    collection = client.get_or_create_collection(
-        name=collection_name,
-        embedding_function=_gemini_ef
-    )
+    # collection = client.get_or_create_collection(
+    #     name=collection_name,
+    #     embedding_function=_gemini_ef
+    # )
 
     documents = df['description'].tolist() # Assuming 'description' column holds the text to embed
     metadatas = df.drop(columns=['description']).to_dict(orient='records')
