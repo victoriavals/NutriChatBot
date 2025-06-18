@@ -51,10 +51,10 @@ def index_nutrition_data(df: pd.DataFrame, client: chromadb.PersistentClient):
     except Exception:
         pass # Collection does not exist, safe to create
 
-    # collection = client.get_or_create_collection(
-    #     name=collection_name,
-    #     embedding_function=_gemini_ef
-    # )
+    collection = client.get_or_create_collection(
+        name=collection_name,
+        embedding_function=_gemini_ef
+    )
 
     documents = df['description'].tolist() # Assuming 'description' column holds the text to embed
     metadatas = df.drop(columns=['description']).to_dict(orient='records')
