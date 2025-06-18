@@ -20,6 +20,5 @@ build-backend = "setuptools.build_meta"
 
 [tool.uv]
 
-[tool.setuptools.exclude-package-dir]
-# Direktori di tingkat root yang harus diabaikan oleh setuptools sebagai paket Python
-"" = ["data", "chroma"]
+[tool.setuptools]
+py-modules = ["app", "embeddings"]
