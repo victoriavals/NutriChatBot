@@ -109,7 +109,8 @@ if menu_selection == "Index Data":
 
 elif menu_selection == "Tanya Gizi":
     st.header("💬 Tanya Gizi")
-    st.write("Data gizi diambil berdasarkan data yang kami miliki. \n Ajukan pertanyaan tentang gizi makanan yang sudah diindeks. Contoh: 'Berapa kalori nasi goreng?'")
+    st.write("""Data gizi diambil berdasarkan data yang kami miliki.
+             Ajukan pertanyaan tentang gizi makanan yang sudah diindeks. Contoh: 'Berapa kalori nasi goreng?'""")
     user_query = st.text_input("Pertanyaan Anda:", key="rag_query_input")
     if st.button("Cari Jawaban", key="rag_query_button"):
         if user_query:
