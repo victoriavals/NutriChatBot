@@ -10,7 +10,6 @@ dependencies = [
     "google-generativeai",
     "python-dotenv",
     "chromadb",
-    "pysqlite3-binary",
 ]
 requires-python = ">=3.9"
 
@@ -18,7 +17,6 @@ requires-python = ">=3.9"
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.uv]
 
 [tool.setuptools]
 py-modules = ["app", "embeddings"]
