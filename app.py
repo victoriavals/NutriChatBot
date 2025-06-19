@@ -89,8 +89,8 @@ st.markdown("Asisten pribadi Anda untuk nutrisi dan resep sehat.")
 with st.sidebar:
     st.header("Menu")
     menu_selection = st.radio("Pilih Opsi", [
-        "Index Data",
-        "Tanya Gizi (RAG)",
+        # "Index Data", #UNCOMMENT THIS LINE TO BUILD CHROMA DB (RAG)
+        "Tanya Gizi",
         "Masak Apa Hari Ini?",
         "Perencana Menu Mingguan",
         "Alternatif Sehat"
@@ -107,9 +107,9 @@ if menu_selection == "Index Data":
         load_data(conn)
         conn.close()
 
-elif menu_selection == "Tanya Gizi (RAG)":
-    st.header("💬 Tanya Gizi (RAG)")
-    st.write("Ajukan pertanyaan tentang gizi makanan yang sudah diindeks. Contoh: 'Berapa kalori nasi goreng?'")
+elif menu_selection == "Tanya Gizi":
+    st.header("💬 Tanya Gizi")
+    st.write("Data gizi diambil berdasarkan data yang kami miliki. \n Ajukan pertanyaan tentang gizi makanan yang sudah diindeks. Contoh: 'Berapa kalori nasi goreng?'")
     user_query = st.text_input("Pertanyaan Anda:", key="rag_query_input")
     if st.button("Cari Jawaban", key="rag_query_button"):
         if user_query:
