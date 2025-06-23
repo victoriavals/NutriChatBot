@@ -7,7 +7,7 @@ dependencies = [
     "google-generativeai",
     "python-dotenv",
     "chromadb",
-    "pysqlite3-binary", #command this if you run locally in windows
+    #"pysqlite3-binary", #command this if you run locally in windows
 ]
 requires-python = ">=3.9"
 
