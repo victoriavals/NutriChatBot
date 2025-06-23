@@ -1,6 +1,7 @@
 [project]
 name = "nutrichatbot"
 version = "0.1.0"
+description = "Chatbot Asisten Gizi & Resep Sehat dengan RAG"
 dependencies = [
     "streamlit",
     "pandas",
@@ -15,6 +16,7 @@ requires-python = ">=3.9"
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.uv]
 
 [tool.setuptools]
 py-modules = ["app", "embeddings"]

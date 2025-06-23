@@ -1,7 +1,0 @@
-streamlit
-pysqlite3-binary
-pandas
-google-generativeai
-python-dotenv
-chromadb
-google-genai
