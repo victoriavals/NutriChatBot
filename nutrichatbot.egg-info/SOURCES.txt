@@ -1,0 +1,9 @@
+README.md
+app.py
+embeddings.py
+pyproject.toml
+nutrichatbot.egg-info/PKG-INFO
+nutrichatbot.egg-info/SOURCES.txt
+nutrichatbot.egg-info/dependency_links.txt
+nutrichatbot.egg-info/requires.txt
+nutrichatbot.egg-info/top_level.txt
