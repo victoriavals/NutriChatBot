@@ -1,1 +1,6 @@
-pysqlite3-binary
+streamlit>=1.45.0,<2.0.0
+pandas>=2.2.0,<3.0.0
+google-generativeai>=0.8.5,<1.0.0
+python-dotenv>=1.0.0,<2.0.0
+chromadb>=1.0.0,<2.0.0
+pysqlite3-binary>=0.5.4; sys_platform == 'linux'

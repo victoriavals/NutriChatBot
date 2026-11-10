@@ -1,117 +1,122 @@
 # NutriChatBot
 
-## Project Title
-
-**NutriChatBot**
-
 ## Overview
 
-NutriChatBot adalah chatbot web interaktif yang membantu kamu:
+**NutriChatBot** adalah chatbot web interaktif berbasis **Streamlit** dan **Google Gemini API** yang membantu pengguna:
 
-- Menjawab pertanyaan gizi dengan akurat
-- Merekomendasikan resep sehat berdasarkan bahan di kulkas
+- Menjawab pertanyaan gizi secara akurat dengan **RAG (Retrieval-Augmented Generation)**
+- Merekomendasikan resep sehat berdasarkan bahan yang tersedia
 - Menyusun rencana menu mingguan sesuai target kalori
-- Menyediakan alternatif bahan sehat
+- Menyediakan alternatif bahan makanan yang lebih sehat
 
 Tujuan utama: memberdayakan pengguna membuat pilihan makanan sehat, menghemat waktu, dan meminimalkan limbah makanan.
 
-## Motivation
-
-Di tengah banjir informasi gizi, sulit mendapatkan data yang terpercaya dan cepat. Banyak orang mengalami:
-
-- Kebingungan tentang kandungan nutrisi makanan
-- Tantangan merencanakan menu sehat harian atau mingguan
-- Kendala memanfaatkan bahan sisa di rumah
-
-**Target pengguna**: individu yang peduli kesehatan, sedang diet, maupun pencari inspirasi resep.
-
-## Features
-
-- **Tanya Gizi (RAG)**: jawaban gizi akurat dari basis data vektor (ChromaDB)
-- **Masak Apa Hari Ini?**: ide resep otomatis dari bahan yang ada
-- **Perencana Menu Mingguan**: susun menu 7 hari sesuai target kalori
-- **Alternatif Sehat**: saran substitusi bahan lebih sehat
-
-## Architecture & Technology Stack
+## Architecture & Project Structure
 
 ```text
-[User] → Streamlit (Front‑end) → Back‑end Python  
-      → RAG Engine (ChromaDB + Google Gemini API)  
-      → SQLite (data nutrisi & resep)
+[User] → Streamlit UI (app.py)
+       → Service Layer (services/llm.py, services/database.py, services/embeddings.py)
+       → RAG Engine (ChromaDB SQLite + HNSW + Google Gemini API)
+       → SQLite (nutrition.db, auto-initialized dari data/nutrition.csv)
 ```
 
+```text
+NutriChatBot/
+├── app.py                      # Streamlit UI entrypoint (with @st.cache_resource)
+├── config.py                   # Centralized env config, constants, & redacted logger
+├── embeddings.py               # Backward-compatible facade for RAG helpers
+├── services/
+│   ├── database.py             # SQLite connection manager, CSV validation & search
+│   ├── embeddings.py           # ChromaDB client, batched indexing, & retrieval
+│   └── llm.py                  # Gemini prompt builders & text generation
+├── scripts/
+│   └── rebuild_index.py        # CLI tool to rebuild SQLite & ChromaDB index
+├── tests/                      # Automated pytest suite
+├── data/
+│   └── nutrition.csv           # Indonesian food nutrition dataset (1,346 items)
+├── .env.example                # Environment variables template
+└── pyproject.toml              # Project metadata & PEP 508 dependencies
+```
+
+### Technology Stack
+
 - **Bahasa**: Python 3.10+
-- **Front‑end**: Streamlit
-- **AI/ML**: Google Gemini API (chat & embedding)
-- **Vector DB**: ChromaDB (DuckDB + Parquet)
+- **Front-end**: Streamlit
+- **AI/LLM**: Google Gemini API (`gemini-2.0-flash` default, dapat diubah via `GEMINI_MODEL`)
+- **Vector DB**: ChromaDB (SQLite metadata + HNSW vector index)
 - **Relational DB**: SQLite
-- **Env**: python-dotenv, uv
-
-## How It Works
-
-1. **Input**: pengguna kirim pertanyaan atau daftar bahan
-2. **Embedding & Retrieval**: query diubah ke vektor, cari top‑k di ChromaDB
-3. **Prompt Engineering**: gabungkan konteks, kirim ke Gemini LLM
-4. **Generation**: Gemini hasilkan jawaban/resep/menu
-5. **Display**: tampilkan respons di Streamlit
+- **Dependency & Env Management**: `uv`, `python-dotenv`
+- **Testing & Linting**: `pytest`, `ruff`
 
 ## Installation & Setup
 
 ### Prasyarat
 
 - Python 3.10+
-- uv ([https://astral.sh/uv](https://astral.sh/uv))
-- API key Google Gemini
+- [uv](https://astral.sh/uv)
+- API key Google Gemini dari Google AI Studio
 
-### Langkah instalasi
+### Langkah Instalasi
 
 ```bash
-git clone https://github.com/victoriavals/nutrichatbot.git
-cd nutrichatbot
+git clone https://github.com/victoriavals/NutriChatBot.git
+cd NutriChatBot
 
-# buat virtual env & install deps
-date
+# Buat virtual environment & install seluruh dependencies (termasuk dev tools)
 uv venv
-uv sync
+uv sync --extra dev
 
-# tambahkan .env
-echo "GEMINI_API_KEY=YOUR_KEY_HERE" > .env
+# Siapkan environment variables
+cp .env.example .env
+# Edit .env dan isi GEMINI_API_KEY dengan API key aktif Anda
+```
 
-# siapkan dataset
-# file 'nutrition.csv' di folder data/ berasal dari Kaggle:
-# https://www.kaggle.com/datasets/anasfikrihanif/indonesian-food-and-drink-nutrition-dataset
+> [!NOTE]
+> `pyproject.toml` sudah menggunakan marker `; sys_platform == 'linux'` untuk `pysqlite3-binary`, sehingga instalasi lokal di Windows/macOS maupun deployment di Linux/Streamlit Cloud berjalan otomatis tanpa perlu mengedit `pyproject.toml` secara manual.
 
-buka file pyproject.toml lalu command pada baris "pysqlite3-binary" karena itu hanya untuk environment linux
+### Membangun Ulang Index Database & Vector (RAG)
 
-# jalankan aplikasi
+`nutrition.db` akan otomatis diinisialisasi dari `data/nutrition.csv` saat aplikasi berjalan, sedangkan index vektor **ChromaDB** untuk fitur **Tanya Gizi (RAG)** dapat dibangun melalui CLI atau menu **Index Data** di aplikasi:
+
+```bash
+# Bangun ulang SQLite dan ChromaDB sekaligus membersihkan segment lama/yatim
+uv run python scripts/rebuild_index.py --clean
+
+# Atau hanya bangun ulang SQLite tanpa memanggil Gemini Embeddings API
+uv run python scripts/rebuild_index.py --skip-chroma
+```
+
+### Menjalankan Aplikasi
+
+```bash
 uv run streamlit run app.py
+```
+
+## Testing & Verification
+
+```bash
+# Jalankan seluruh automated tests (offline dengan mock untuk LLM & ChromaDB)
+uv run pytest -v
+
+# Syntax & lint check
+uv run python -m py_compile app.py config.py embeddings.py services/*.py scripts/*.py
+uv run ruff check .
 ```
 
 ## Usage
 
-- **Tanya Gizi**: `Berapa kalori sepiring nasi goreng?`
-- **Resep**: `ayam, kentang, wortel`
-- **Menu Mingguan**: masukkan target kalori, klik *Buat Rencana*
-- **Alternatif**: `gula` → substitusi sehat
+- **Tanya Gizi**: `Berapa kalori sepiring nasi goreng?` (memiliki fallback pencarian SQLite apabila index ChromaDB belum dibangun)
+- **Masak Apa Hari Ini?**: `ayam, brokoli, bawang putih`
+- **Perencana Menu Mingguan**: masukkan target kalori harian (`1000–5000` kcal), klik *Buat Rencana Menu*
+- **Alternatif Sehat**: `gula` → substitusi sehat beserta alasan dan cara penggunaan
+- **Index Data**: muat ulang CSV dan indeks ulang ChromaDB langsung dari UI
 
 ## Demo
 
-Akses demo:
-
-```
-https://nutrichatbot.streamlit.app/
-```
-
-## Future Improvements
-
-- Fine‑tuning lokal model dengan resep Indonesia
-- Integrasi deteksi gambar makanan
-- Profil pengguna untuk rekomendasi lebih personal
-- Dukungan multi‑bahasa
+Akses demo: `https://nutrichatbot.streamlit.app/`
 
 ## License & Credits
 
 - **License**: MIT
 - **Data nutrisi** diambil dari Kaggle dataset: [Indonesian Food and Drink Nutrition Dataset](https://www.kaggle.com/datasets/anasfikrihanif/indonesian-food-and-drink-nutrition-dataset)
-- **Dikembangkan oleh**: [Naufal Firdaus]
-
+- **Dikembangkan oleh**: Naufal Firdaus

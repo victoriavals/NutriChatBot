@@ -2,15 +2,22 @@
 name = "nutrichatbot"
 version = "0.1.0"
 description = "Chatbot Asisten Gizi & Resep Sehat dengan RAG"
+readme = "README.md"
+requires-python = ">=3.10"
 dependencies = [
-    "streamlit",
-    "pandas",
-    "google-generativeai",
-    "python-dotenv",
-    "chromadb",
-    "pysqlite3-binary", #comand this line if you run locally
+    "streamlit>=1.45.0,<2.0.0",
+    "pandas>=2.2.0,<3.0.0",
+    "google-generativeai>=0.8.5,<1.0.0",
+    "python-dotenv>=1.0.0,<2.0.0",
+    "chromadb>=1.0.0,<2.0.0",
+    "pysqlite3-binary>=0.5.4; sys_platform == 'linux'",
 ]
-requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.4.0",
+]
 
 [build-system]
 requires = ["setuptools>=61.0"]
@@ -19,4 +26,13 @@ build-backend = "setuptools.build_meta"
 [tool.uv]
 
 [tool.setuptools]
-py-modules = ["app", "embeddings"]
+packages = ["services"]
+py-modules = ["app", "config", "embeddings"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

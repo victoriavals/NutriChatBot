@@ -1,3 +1,4 @@
 # .streamlit/config.toml
-[compatibility]
-python_version = "3.11.9"
+# Referensi opsi valid: https://docs.streamlit.io/develop/api-reference/configuration/config.toml
+[browser]
+gatherUsageStats = false

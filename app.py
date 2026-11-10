@@ -1,200 +1,327 @@
-"""
-This is the main Streamlit application for NutriChatBot: Asisten Gizi & Resep Sehat.
-It provides various functionalities including RAG-based nutrition questions,
-recipe generation, weekly meal planning, and healthy alternatives.
-"""
+"""Streamlit UI entrypoint for NutriChatBot: Asisten Gizi & Resep Sehat."""
 
-import streamlit as st
+from __future__ import annotations
+
+from typing import Any
+
 import pandas as pd
-import sqlite3
-import os
-import google.generativeai as genai
-from dotenv import load_dotenv
-from embeddings import get_chroma_client, index_nutrition_data, rag_query
+import streamlit as st
 
-# --- Environment Loading and Gemini Client Initialization ---
-load_dotenv()
-try:
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    if not GEMINI_API_KEY:
-        st.error("GEMINI_API_KEY not found. Please set it in your .env file.")
-        st.stop()
-    genai.configure(api_key=GEMINI_API_KEY)
-    gemini_model = genai.GenerativeModel("gemini-2.0-flash")
-except Exception as e:
-    st.error(f"Error initializing Gemini: {e}")
-    st.stop()
-
-# --- SQLite Initialization ---
-DB_NAME = "nutrition.db"
-CSV_PATH = "data/nutrition.csv"
-
-def get_db_connection():
-    """Establishes and returns a connection to the SQLite database."""
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row # This allows accessing columns by name
-    return conn
-
-def load_data(conn):
-    """
-    Reads nutrition data from data/nutrition.csv, normalizes column names,
-    stores it into an SQLite table 'nutrition', and then indexes it into Chroma DB.
-    """
-    st.info(f"Loading data from {CSV_PATH}...")
-    try:
-        df = pd.read_csv(CSV_PATH)
-        # Normalize column names by making them lowercase and replacing spaces with underscores
-        df.columns = df.columns.str.lower().str.replace(' ', '_')
-
-        # Ensure 'description' column exists for RAG indexing
-        if 'name' in df.columns and 'calories' in df.columns:
-            df['description'] = df['name'] + ' has ' + df['calories'].astype(str) + ' calories, ' + \
-                                df['proteins'].astype(str) + 'g protein, ' + \
-                                df['fat'].astype(str) + 'g fat, and ' + \
-                                df['carbohydrate'].astype(str) + 'g carbohydrate.'
-        else:
-            st.error("CSV must contain 'name' and 'calories' columns for description generation.")
-            return
-
-        # Store into SQLite
-        df.to_sql('nutrition', conn, if_exists='replace', index=False)
-        st.success("Nutrition data loaded into SQLite database.")
-
-        # Index into Chroma DB
-        chroma_client = get_chroma_client()
-        index_nutrition_data(df, chroma_client)
-        st.success("Nutrition data indexed into Chroma DB for RAG.")
-
-    except FileNotFoundError:
-        st.error(f"Error: {CSV_PATH} not found. Please make sure it's in the 'data/' directory.")
-    except Exception as e:
-        st.error(f"Error loading and indexing data: {e}")
-
-def get_nutrition(conn, item: str):
-    """Queries SQLite for nutrition information about a specific item."""
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM nutrition WHERE LOWER(name) LIKE ?", ('%' + item.lower() + '%',))
-    return cursor.fetchall()
-
-# --- Streamlit UI ---
-st.set_page_config(
-    page_title="NutriChatBot: Asisten Gizi & Resep Sehat",
-    layout="wide",
-    initial_sidebar_state="expanded"
+from config import (
+    DEFAULT_DAILY_CALORIES,
+    MAX_DAILY_CALORIES,
+    MIN_DAILY_CALORIES,
+    ConfigurationError,
+    get_logger,
+    load_settings,
+)
+from services.database import (
+    DatabaseError,
+    ensure_sqlite_initialized,
+    get_nutrition_count,
+    load_and_validate_csv,
+    save_nutrition_to_sqlite,
+    search_nutrition,
+)
+from services.embeddings import (
+    EmbeddingServiceError,
+    create_gemini_embedding_function,
+    get_chroma_client,
+    get_collection_count,
+    index_nutrition_data,
+)
+from services.llm import (
+    InputValidationError,
+    LLMServiceError,
+    answer_nutrition_question,
+    create_gemini_model,
+    generate_recipe,
+    generate_weekly_menu,
+    suggest_healthy_alternatives,
 )
 
-st.title("NutriChatBot: Asisten Gizi & Resep Sehat 🍎🥕")
-st.markdown("Asisten pribadi Anda untuk nutrisi dan resep sehat.")
+logger = get_logger(__name__)
 
-with st.sidebar:
-    st.header("Menu")
-    menu_selection = st.radio("Pilih Opsi", [
-        # "Index Data", #UNCOMMENT THIS LINE TO BUILD CHROMA DB (RAG)
-        "Tanya Gizi",
-        "Masak Apa Hari Ini?",
-        "Perencana Menu Mingguan",
-        "Alternatif Sehat"
-    ])
-    st.markdown("---")
-    st.write("By Naufal Firdaus")
 
-conn = get_db_connection()
+@st.cache_resource
+def get_cached_gemini_model(api_key: str, model_name: str) -> Any:
+    """Cache the Gemini GenerativeModel instance across Streamlit reruns."""
+    return create_gemini_model(api_key=api_key, model_name=model_name)
 
-if menu_selection == "Index Data":
-    st.header("⚙️ Index Data Nutrisi")
-    st.write("Klik tombol di bawah untuk memuat data nutrisi dari `data/nutrition.csv` ke dalam database SQLite dan mengindeksnya ke Chroma DB.")
-    if st.button("Muat & Indeks Data"):
-        load_data(conn)
-        conn.close()
 
-elif menu_selection == "Tanya Gizi":
+@st.cache_resource
+def get_cached_chroma_client(chroma_path: str) -> Any:
+    """Cache the ChromaDB PersistentClient across Streamlit reruns."""
+    return get_chroma_client(chroma_path)
+
+
+@st.cache_resource
+def get_cached_embedding_fn(api_key: str) -> Any:
+    """Cache the Gemini embedding function across Streamlit reruns."""
+    return create_gemini_embedding_function(api_key)
+
+
+@st.cache_resource
+def init_sqlite_once(csv_path: str, db_path: str) -> bool:
+    """Auto-populate SQLite from CSV once if the database is missing or empty."""
+    return ensure_sqlite_initialized(csv_path=csv_path, db_path=db_path)
+
+
+def _render_sqlite_fallback(query: str, db_path: str) -> None:
+    """Display SQLite substring matches when vector RAG index is unavailable."""
+    try:
+        matches = search_nutrition(query, db_path=db_path, limit=5)
+    except DatabaseError as exc:
+        st.error(str(exc))
+        return
+
+    if matches:
+        st.info("Menampilkan hasil pencarian langsung dari database SQLite:")
+        display_df = pd.DataFrame(matches).drop(columns=["description"], errors="ignore")
+        st.dataframe(display_df, use_container_width=True, hide_index=True)
+    else:
+        st.info("Tidak ada kecocokan langsung di database SQLite untuk kata kunci tersebut.")
+
+
+def _render_tanya_gizi(
+    gemini_model: Any,
+    chroma_client: Any,
+    embedding_fn: Any,
+    db_path: str,
+) -> None:
+    """Render the RAG-based nutrition Q&A tab."""
     st.header("💬 Tanya Gizi")
-    st.write("Data gizi diambil berdasarkan data yang kami miliki.")
-    st.write("Ajukan pertanyaan tentang gizi makanan yang sudah diindeks. Contoh: 'Berapa kalori nasi goreng?'")
-    user_query = st.text_input("Pertanyaan Anda:", key="rag_query_input")
+    st.write("Ajukan pertanyaan tentang kandungan gizi makanan berdasarkan dataset nutrisi.")
+
+    user_query = st.text_input(
+        "Pertanyaan Anda:",
+        placeholder="Contoh: Berapa kalori sepiring nasi goreng?",
+        key="rag_query_input",
+    )
+
     if st.button("Cari Jawaban", key="rag_query_button"):
-        if user_query:
-            with st.spinner("Mencari jawaban..."):
-                try:
-                    chroma_client = get_chroma_client()
-                    answer = rag_query(gemini_model, user_query, chroma_client)
-                    st.write("---")
-                    st.subheader("Jawaban:")
-                    st.write(answer)
-                except Exception as e:
-                    st.error(f"Terjadi kesalahan saat memproses pertanyaan RAG: {e}")
-        else:
-            st.warning("Mohon masukkan pertanyaan Anda.")
+        with st.spinner("Mencari jawaban..."):
+            try:
+                answer, contexts = answer_nutrition_question(
+                    model=gemini_model,
+                    query=user_query,
+                    chroma_client=chroma_client,
+                    embedding_function=embedding_fn,
+                )
+                st.divider()
+                st.subheader("Jawaban:")
+                st.write(answer)
+                if contexts:
+                    with st.expander("Referensi Konteks Nutrisi (ChromaDB)"):
+                        for doc in contexts:
+                            st.markdown(f"- {doc}")
+            except InputValidationError as exc:
+                st.warning(str(exc))
+            except EmbeddingServiceError as exc:
+                st.warning(str(exc))
+                _render_sqlite_fallback(user_query, db_path)
+            except LLMServiceError as exc:
+                st.error(str(exc))
 
-elif menu_selection == "Masak Apa Hari Ini?":
+
+def _render_recipe_generator(gemini_model: Any) -> None:
+    """Render the ingredient-based healthy recipe generator tab."""
     st.header("🍳 Masak Apa Hari Ini?")
-    st.write("Berikan daftar bahan-bahan yang Anda miliki (dipisahkan koma), dan saya akan memberikan ide resep.")
-    ingredients = st.text_input("Bahan-bahan (contoh: ayam, brokoli, bawang putih):", key="recipe_ingredients")
+    st.write(
+        "Berikan daftar bahan-bahan yang Anda miliki (dipisahkan koma), "
+        "dan dapatkan ide resep sehat lengkap."
+    )
+
+    ingredients = st.text_input(
+        "Bahan-bahan:",
+        placeholder="Contoh: ayam, brokoli, bawang putih",
+        key="recipe_ingredients",
+    )
+
     if st.button("Dapatkan Resep", key="get_recipe_button"):
-        if ingredients:
-            with st.spinner("Mencari resep..."):
-                recipe_prompt = f"""
-                Buatkan saya ide resep makanan lengkap berdasarkan bahan-bahan berikut: {ingredients}.
-                Sertakan nama resep, bahan-bahan lengkap (termasuk yang tidak disebutkan jika umum),
-                dan langkah-langkah pembuatannya yang jelas.
-                Format jawaban Anda dalam bahasa Indonesia yang mudah dipahami.
-                """
-                try:
-                    chat = gemini_model.start_chat(history=[])
-                    response = chat.send_message(recipe_prompt, generation_config={"temperature": 0.3, "max_output_tokens": 512})
-                    st.write("---")
-                    st.subheader("Ide Resep Anda:")
-                    st.write(response.text)
-                except Exception as e:
-                    st.error(f"Terjadi kesalahan saat membuat resep: {e}")
-        else:
-            st.warning("Mohon masukkan bahan-bahan yang Anda miliki.")
+        with st.spinner("Mencari resep..."):
+            try:
+                recipe = generate_recipe(model=gemini_model, ingredients=ingredients)
+                st.divider()
+                st.subheader("Ide Resep Anda:")
+                st.write(recipe)
+            except InputValidationError as exc:
+                st.warning(str(exc))
+            except LLMServiceError as exc:
+                st.error(str(exc))
 
-elif menu_selection == "Perencana Menu Mingguan":
+
+def _render_weekly_planner(gemini_model: Any) -> None:
+    """Render the 7-day calorie-targeted meal planner tab."""
     st.header("📅 Perencana Menu Mingguan")
-    st.write("Saya akan membantu Anda membuat rencana menu mingguan berdasarkan kebutuhan kalori harian Anda.")
-    daily_calories = st.number_input("Target Kalori Harian (kcal):", min_value=1000, max_value=5000, value=2000, step=100, key="daily_calories")
+    st.write("Buat rencana menu makanan sehat selama 7 hari sesuai kebutuhan kalori harian Anda.")
+
+    daily_calories = st.number_input(
+        "Target Kalori Harian (kcal):",
+        min_value=MIN_DAILY_CALORIES,
+        max_value=MAX_DAILY_CALORIES,
+        value=DEFAULT_DAILY_CALORIES,
+        step=100,
+        key="daily_calories",
+    )
+
     if st.button("Buat Rencana Menu", key="generate_menu_button"):
-        if daily_calories:
-            with st.spinner("Membuat rencana menu..."):
-                menu_prompt = f"""
-                Buatkan rencana menu makanan sehat untuk satu minggu (7 hari) dengan target rata-rata {daily_calories} kalori per hari.
-                Sertakan sarapan, makan siang, makan malam, dan dua camilan.
-                Berikan ide makanan yang bervariasi dan seimbang secara nutrisi.
-                Format jawaban Anda dalam bahasa Indonesia dengan struktur per hari (contoh: Senin: Sarapan, Makan Siang, dst.).
-                """
-                try:
-                    chat = gemini_model.start_chat(history=[])
-                    response = chat.send_message(menu_prompt, generation_config={"temperature": 0.2, "max_output_tokens": 2048})
-                    st.write("---")
-                    st.subheader("Rencana Menu Mingguan Anda:")
-                    st.write(response.text)
-                except Exception as e:
-                    st.error(f"Terjadi kesalahan saat membuat rencana menu: {e}")
-        else:
-            st.warning("Mohon masukkan target kalori harian Anda.")
+        with st.spinner("Membuat rencana menu..."):
+            try:
+                menu_plan = generate_weekly_menu(
+                    model=gemini_model,
+                    daily_calories=int(daily_calories),
+                )
+                st.divider()
+                st.subheader("Rencana Menu Mingguan Anda:")
+                st.write(menu_plan)
+            except InputValidationError as exc:
+                st.warning(str(exc))
+            except LLMServiceError as exc:
+                st.error(str(exc))
 
-elif menu_selection == "Alternatif Sehat":
+
+def _render_healthy_alternatives(gemini_model: Any) -> None:
+    """Render the healthy ingredient substitution tab."""
     st.header("🥗 Alternatif Sehat")
-    st.write("Masukkan bahan makanan yang ingin Anda cari alternatif sehatnya.")
-    ingredient_to_replace = st.text_input("Bahan yang ingin diganti (contoh: gula, mentega):", key="healthy_alternative_input")
-    if st.button("Cari Alternatif", key="find_alternative_button"):
-        if ingredient_to_replace:
-            with st.spinner("Mencari alternatif..."):
-                alternative_prompt = f"""
-                Berikan beberapa alternatif sehat untuk bahan makanan '{ingredient_to_replace}'.
-                Sertakan mengapa alternatif tersebut lebih sehat dan bagaimana cara menggunakannya.
-                Format jawaban Anda dalam bahasa Indonesia.
-                """
-                try:
-                    chat = gemini_model.start_chat(history=[])
-                    response = chat.send_message(alternative_prompt, generation_config={"temperature": 0.5, "max_output_tokens": 256})
-                    st.write("---")
-                    st.subheader(f"Alternatif Sehat untuk '{ingredient_to_replace}':")
-                    st.write(response.text)
-                except Exception as e:
-                    st.error(f"Terjadi kesalahan saat mencari alternatif sehat: {e}")
-        else:
-            st.warning("Mohon masukkan bahan yang ingin Anda ganti.")
+    st.write("Masukkan bahan makanan yang ingin Anda cari alternatif lebih sehatnya.")
 
-conn.close()
+    ingredient = st.text_input(
+        "Bahan yang ingin diganti:",
+        placeholder="Contoh: gula, mentega, tepung terigu",
+        key="healthy_alternative_input",
+    )
+
+    if st.button("Cari Alternatif", key="find_alternative_button"):
+        with st.spinner("Mencari alternatif..."):
+            try:
+                alternatives = suggest_healthy_alternatives(
+                    model=gemini_model,
+                    ingredient=ingredient,
+                )
+                st.divider()
+                st.subheader(f"Alternatif Sehat untuk '{ingredient.strip()}':")
+                st.write(alternatives)
+            except InputValidationError as exc:
+                st.warning(str(exc))
+            except LLMServiceError as exc:
+                st.error(str(exc))
+
+
+def _render_index_data(
+    csv_path: str,
+    db_path: str,
+    chroma_client: Any,
+    embedding_fn: Any,
+) -> None:
+    """Render the dataset ingestion and ChromaDB re-indexing administration tab."""
+    st.header("⚙️ Index Data Nutrisi")
+    st.write(
+        "Muat ulang dataset dari `data/nutrition.csv` ke database SQLite dan bangun ulang "
+        "index vektor ChromaDB untuk fitur Tanya Gizi (RAG)."
+    )
+    st.info(
+        "Catatan: Proses re-index akan memanggil Gemini Embedding API untuk seluruh item "
+        "di dataset CSV."
+    )
+
+    if st.button("Muat & Indeks Ulang Data", key="reindex_button"):
+        with st.spinner("Memuat CSV, menyimpan ke SQLite, dan mengindeks ke ChromaDB..."):
+            try:
+                df, anomalies = load_and_validate_csv(csv_path)
+                sqlite_count = save_nutrition_to_sqlite(df, db_path)
+                chroma_count = index_nutrition_data(
+                    df=df,
+                    client=chroma_client,
+                    embedding_function=embedding_fn,
+                )
+                st.success(
+                    f"Berhasil memuat {sqlite_count} item ke SQLite dan mengindeks "
+                    f"{chroma_count} item ke ChromaDB."
+                )
+                if anomalies:
+                    with st.expander(f"Peringatan Anomali Data Sumber ({len(anomalies)} item)"):
+                        for warning_msg in anomalies:
+                            st.write(f"- {warning_msg}")
+            except (DatabaseError, EmbeddingServiceError, ValueError) as exc:
+                st.error(str(exc))
+
+
+def main() -> None:
+    """Main Streamlit application entrypoint."""
+    st.set_page_config(
+        page_title="NutriChatBot: Asisten Gizi & Resep Sehat",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+
+    st.title("NutriChatBot: Asisten Gizi & Resep Sehat 🍎🥕")
+    st.markdown("Asisten pribadi Anda untuk nutrisi dan resep sehat.")
+
+    try:
+        settings = load_settings(require_api_key=True)
+    except ConfigurationError as exc:
+        logger.error("Configuration error: %s", exc)
+        st.error(f"{exc} Salin `.env.example` menjadi `.env` dan isi `GEMINI_API_KEY`.")
+        st.stop()
+
+    assert settings.gemini_api_key is not None
+
+    try:
+        init_sqlite_once(str(settings.csv_path), str(settings.db_path))
+    except DatabaseError as exc:
+        logger.warning("SQLite auto-initialization skipped: %s", exc)
+
+    try:
+        gemini_model = get_cached_gemini_model(settings.gemini_api_key, settings.gemini_model)
+        chroma_client = get_cached_chroma_client(str(settings.chroma_path))
+        embedding_fn = get_cached_embedding_fn(settings.gemini_api_key)
+    except Exception:
+        logger.exception("Failed initializing application clients.")
+        st.error("Gagal menginisialisasi layanan AI atau database vektor. Periksa konfigurasi Anda.")
+        st.stop()
+
+    sqlite_count = get_nutrition_count(settings.db_path)
+    chroma_count = get_collection_count(chroma_client, embedding_fn)
+
+    with st.sidebar:
+        st.header("Menu")
+        menu_selection = st.radio(
+            "Pilih Opsi",
+            [
+                "Tanya Gizi",
+                "Masak Apa Hari Ini?",
+                "Perencana Menu Mingguan",
+                "Alternatif Sehat",
+                "Index Data",
+            ],
+        )
+        st.divider()
+        st.caption(f"SQLite: {sqlite_count} item | ChromaDB RAG: {chroma_count} item")
+        if chroma_count == 0:
+            st.warning(
+                "Index ChromaDB masih kosong (0 item). Gunakan menu **Index Data** atau "
+                "`scripts/rebuild_index.py` untuk mengaktifkan RAG."
+            )
+        st.divider()
+        st.write("By Naufal Firdaus")
+
+    if menu_selection == "Tanya Gizi":
+        _render_tanya_gizi(gemini_model, chroma_client, embedding_fn, str(settings.db_path))
+    elif menu_selection == "Masak Apa Hari Ini?":
+        _render_recipe_generator(gemini_model)
+    elif menu_selection == "Perencana Menu Mingguan":
+        _render_weekly_planner(gemini_model)
+    elif menu_selection == "Alternatif Sehat":
+        _render_healthy_alternatives(gemini_model)
+    elif menu_selection == "Index Data":
+        _render_index_data(
+            str(settings.csv_path),
+            str(settings.db_path),
+            chroma_client,
+            embedding_fn,
+        )
+
+
+if __name__ == "__main__":
+    main()

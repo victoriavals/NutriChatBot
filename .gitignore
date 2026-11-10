@@ -1,2 +1,35 @@
+# Environment variables
 .env
 .env.*
+!.env.example
+
+# Python bytecode & build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Generated databases & vector index
+*.db
+*.sqlite
+*.sqlite3
+chroma/
+
+# Testing & linting caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Logs & OS files
+*.log
+.DS_Store
+Thumbs.db

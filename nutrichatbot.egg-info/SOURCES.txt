@@ -1,5 +1,6 @@
 README.md
 app.py
+config.py
 embeddings.py
 pyproject.toml
 nutrichatbot.egg-info/PKG-INFO
@@ -7,3 +8,13 @@ nutrichatbot.egg-info/SOURCES.txt
 nutrichatbot.egg-info/dependency_links.txt
 nutrichatbot.egg-info/requires.txt
 nutrichatbot.egg-info/top_level.txt
+services/__init__.py
+services/database.py
+services/embeddings.py
+services/llm.py
+tests/test_app_ui.py
+tests/test_config.py
+tests/test_data_integrity.py
+tests/test_database.py
+tests/test_embeddings.py
+tests/test_llm.py

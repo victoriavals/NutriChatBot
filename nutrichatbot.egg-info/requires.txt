@@ -1,5 +1,12 @@
-streamlit
-pandas
-google-generativeai
-python-dotenv
-chromadb
+streamlit<2.0.0,>=1.45.0
+pandas<3.0.0,>=2.2.0
+google-generativeai<1.0.0,>=0.8.5
+python-dotenv<2.0.0,>=1.0.0
+chromadb<2.0.0,>=1.0.0
+
+[:sys_platform == "linux"]
+pysqlite3-binary>=0.5.4
+
+[dev]
+pytest>=8.0.0
+ruff>=0.4.0
