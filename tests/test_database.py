@@ -12,11 +12,13 @@ from services.database import (
     DatabaseError,
     detect_nutrition_anomalies,
     ensure_sqlite_initialized,
+    extract_food_keywords,
     get_db_connection,
     get_nutrition_count,
     load_and_validate_csv,
     save_nutrition_to_sqlite,
     search_nutrition,
+    search_nutrition_keyword_ranked,
 )
 
 
@@ -24,9 +26,11 @@ def test_load_and_validate_csv_builds_descriptions(sample_csv_file: Path) -> Non
     df, anomalies = load_and_validate_csv(sample_csv_file)
     assert len(df) == 3
     assert "description" in df.columns
-    assert "Nasi Goreng has 250.0 calories" in df.iloc[0]["description"]
+    assert "Nasi Goreng mengandung energi 250.0 kkal" in df.iloc[0]["description"]
+    assert "per 100g porsi dapat dimakan" in df.iloc[0]["description"]
     assert df.iloc[1]["image"] == ""
     assert anomalies == []
+
 
 
 def test_load_and_validate_csv_rejects_missing_required_columns(tmp_path: Path) -> None:
@@ -100,4 +104,57 @@ def test_detect_nutrition_anomalies_flags_implausible_macros() -> None:
     )
     warnings = detect_nutrition_anomalies(df)
     assert len(warnings) == 3
+
+
+def test_extract_food_keywords_removes_stopwords() -> None:
+    query = "Berapa kalori dan protein dalam dada ayam goreng?"
+    keywords = extract_food_keywords(query)
+    assert "dada" in keywords
+    assert "ayam" in keywords
+    assert "goreng" in keywords
+    assert "berapa" not in keywords
+    assert "kalori" not in keywords
+    assert "protein" not in keywords
+    assert "dan" not in keywords
+
+
+def test_search_nutrition_keyword_ranked_ranks_multi_term(sample_csv_file: Path, tmp_path: Path) -> None:
+    db_path = tmp_path / "keyword_test.db"
+    df, _ = load_and_validate_csv(sample_csv_file)
+    extra_df = pd.concat(
+        [
+            df,
+            pd.DataFrame(
+                [
+                    {
+                        "name": "Ayam goreng dada",
+                        "calories": 290.0,
+                        "proteins": 34.0,
+                        "fat": 15.0,
+                        "carbohydrate": 0.5,
+                        "image": "",
+                        "description": "Ayam goreng dada mengandung energi 290.0 kkal...",
+                    },
+                    {
+                        "name": "Telur dadar",
+                        "calories": 240.0,
+                        "proteins": 14.0,
+                        "fat": 18.0,
+                        "carbohydrate": 1.2,
+                        "image": "",
+                        "description": "Telur dadar mengandung energi 240.0 kkal...",
+                    },
+                ]
+            ),
+        ],
+        ignore_index=True,
+    )
+    save_nutrition_to_sqlite(extra_df, db_path)
+
+    results = search_nutrition_keyword_ranked("Berapa kalori dada ayam?", db_path=db_path, limit=5)
+    assert len(results) > 0
+    assert "dada" in results[0]["name"].lower()
+    assert "ayam" in results[0]["name"].lower()
+
+
 
