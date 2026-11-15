@@ -24,6 +24,9 @@
 | **Comparative Takeaway Cards** | `app.py`: Lines 555–580 (Automated lower calorie & higher protein diff logic) | Visual verification in `03-perbandingan-gizi-visual.webp` |
 | **Separated Developer Drawer** | `app.py`: Lines 795–810 (Collapsible telemetry expander in sidebar) | `tests/test_app_ui.py` sidebar assertion checks pass |
 | **Dataset Integrity** | `data/nutrition.csv`: 1,346 rows, verified schema & columns | `tests/test_data_integrity.py::test_repository_nutrition_csv_integrity` (PASS) |
+| **Household Servings (URT)** | `services/serving_size.py`: Lines 1–180 (`calculate_nutrition_for_serving`) | `tests/test_serving_size.py` (8 tests PASS) |
+| **Packaged Foods & Nutri-Score** | `services/database.py`: Lines 380–490 (`search_packaged_foods`, 60 products) | `tests/test_packaged_nutrition.py` (4 tests PASS) |
+| **Authentic Regional Recipes** | `services/recipe_service.py` & `services/database.py` (30 authentic recipes) | `tests/test_recipe_service.py` (5 tests PASS) |
 | **Database Anomaly Checks** | `services/database.py`: Lines 110–145 (`detect_nutrition_anomalies`) | `tests/test_database.py::test_detect_nutrition_anomalies_flags_implausible_macros` (PASS) |
 
 ---
@@ -32,10 +35,10 @@
 
 ### A. Pytest Automated Test Suite
 - **Command:** `.venv/Scripts/pytest -v`
-- **Total Tests:** 51
-- **Passed:** 51
+- **Total Tests:** 68
+- **Passed:** 68
 - **Failed:** 0
-- **Duration:** 5.85s
+- **Duration:** 6.35s
 - **Exit Code:** 0
 
 ### B. Dedicated QA End-to-End Suite (`scratch/qa_suite_runner.py`)

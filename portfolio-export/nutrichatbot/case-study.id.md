@@ -191,8 +191,8 @@ $$\text{TDEE} = \text{BMR} \times \text{Faktor Aktivitas}$$
 Implementasi sistem telah diverifikasi secara menyeluruh melalui beberapa lapisan pengujian:
 
 1. **Rangkaian Uji Otomatis Pytest:**
-   - **51 kasus uji otomatis** mencakup alur UI, konfigurasi, operasi database, embedding, streaming LLM, dan kalkulator gizi.
-   - **Hasil:** 100% LULUS (exit code 0, selesai dalam 5,85 detik).
+   - **68 kasus uji otomatis** mencakup alur UI (7 menu), konfigurasi, operasi database multi-tabel (pangan dasar, FMCG, resep), modul URT, embedding, streaming LLM, dan kalkulator gizi.
+   - **Hasil:** 100% LULUS (exit code 0, selesai dalam ~6,35 detik).
 2. **Uji Regresi Khusus (`scratch/qa_suite_runner.py`):**
    - **18 skenario uji end-to-end** mencakup pencarian entitas eksak, ketahanan SQLi (`OR 1=1`), redaksi API key pada log, injeksi peringatan klinis, dan presisi BMR.
    - **Hasil:** 18/18 LULUS (100% sukses).

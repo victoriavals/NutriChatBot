@@ -218,4 +218,50 @@ CREATE TABLE IF NOT EXISTS nutrition (
 );
 CREATE INDEX IF NOT EXISTS idx_nutrition_name ON nutrition(name);
 CREATE INDEX IF NOT EXISTS idx_nutrition_category ON nutrition(category);
+
+### SQLite Table Schema (`packaged_nutrition`)
+```sql
+CREATE TABLE IF NOT EXISTS packaged_nutrition (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    brand TEXT NOT NULL,
+    category TEXT NOT NULL,
+    serving_size_g REAL NOT NULL,
+    serving_unit TEXT NOT NULL,
+    calories REAL NOT NULL,
+    proteins REAL NOT NULL,
+    fat REAL NOT NULL,
+    carbohydrate REAL NOT NULL,
+    saturated_fat REAL,
+    sugars REAL,
+    sodium_mg REAL,
+    nutri_score TEXT,
+    description TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_packaged_name ON packaged_nutrition(name);
+CREATE INDEX IF NOT EXISTS idx_packaged_brand ON packaged_nutrition(brand);
+CREATE INDEX IF NOT EXISTS idx_packaged_category ON packaged_nutrition(category);
+```
+
+### SQLite Table Schema (`recipes`)
+```sql
+CREATE TABLE IF NOT EXISTS recipes (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    origin_region TEXT NOT NULL,
+    category TEXT NOT NULL,
+    prep_time_minutes INTEGER NOT NULL,
+    servings INTEGER NOT NULL,
+    ingredients_json TEXT NOT NULL,
+    instructions_text TEXT NOT NULL,
+    calories_per_serving REAL NOT NULL,
+    protein_g REAL NOT NULL,
+    fat_g REAL NOT NULL,
+    carb_g REAL NOT NULL,
+    health_tags TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_recipes_name ON recipes(name);
+CREATE INDEX IF NOT EXISTS idx_recipes_category ON recipes(category);
+CREATE INDEX IF NOT EXISTS idx_recipes_origin ON recipes(origin_region);
+```
 ```

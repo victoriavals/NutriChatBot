@@ -19,10 +19,14 @@ from services.database import (
     DatabaseError,
     ensure_sqlite_initialized,
     get_nutrition_count,
+    get_packaged_categories,
+    get_packaged_nutrition_count,
+    get_recipes_count,
     load_and_validate_csv,
     save_nutrition_to_sqlite,
     search_nutrition,
     search_nutrition_keyword_ranked,
+    search_packaged_foods,
 )
 from services.embeddings import (
     EmbeddingServiceError,
@@ -42,6 +46,12 @@ from services.llm import (
     suggest_healthy_alternatives_stream,
 )
 from services.nutrition_calc import calculate_personalized_nutrition_plan
+from services.recipe_service import find_recipes_by_pantry_ingredients
+from services.serving_size import (
+    calculate_nutrition_for_serving,
+    format_serving_summary,
+    get_serving_options,
+)
 
 logger = get_logger(__name__)
 
@@ -106,6 +116,28 @@ def _inject_custom_styles() -> None:
             border-radius: 12px;
             padding: 12px;
             margin-bottom: 8px;
+        }
+        /* Nutri-Score Badges */
+        .nutri-score-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+        .nutri-a { background-color: #038141; }
+        .nutri-b { background-color: #85BB2F; }
+        .nutri-c { background-color: #FECB02; color: #222222; }
+        .nutri-d { background-color: #EE8100; }
+        .nutri-e { background-color: #E63E11; }
+        .fmcg-card {
+            background-color: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
         }
         </style>
         """,
@@ -277,8 +309,54 @@ def _render_tanya_gizi(
             except LLMServiceError as exc:
                 st.error(str(exc))
 
+    st.markdown("---")
+    with st.expander("🥄 Kalkulator Takaran Porsi Rumah Tangga (URT) — Centong, Butir, Potong", expanded=False):
+        st.write(
+            "Ubah takaran 100 gram standar laboratorium menjadi porsi piring makan sehari-hari "
+            "(misal: centong nasi, butir telur, potong ayam)."
+        )
+        c_urt_f, c_urt_p = st.columns([2, 2])
+        with c_urt_f:
+            urt_food_input = st.text_input(
+                "Nama Makanan untuk Dihitung:",
+                value="Nasi putih",
+                key="urt_food_name_input",
+                placeholder="Contoh: Nasi putih, Telur ayam, Dada ayam",
+            )
+        options = get_serving_options(urt_food_input)
+        with c_urt_p:
+            urt_choice = st.selectbox(
+                "Pilih Takaran Porsi Sehari-hari:",
+                options=[opt.label for opt in options],
+                key="urt_serving_select",
+            )
+        selected_opt = next((opt for opt in options if opt.label == urt_choice), options[0])
 
-def _render_recipe_generator(llm_client: Any, model_name: str) -> None:
+        urt_matches = search_nutrition_keyword_ranked(urt_food_input, db_path=db_path, limit=1)
+        if urt_matches:
+            base_item = urt_matches[0]
+            scaled = calculate_nutrition_for_serving(
+                calories_100g=float(base_item["calories"]),
+                proteins_100g=float(base_item["proteins"]),
+                fat_100g=float(base_item["fat"]),
+                carb_100g=float(base_item["carbohydrate"]),
+                serving_grams=selected_opt.grams,
+            )
+            st.success(format_serving_summary(base_item["name"], selected_opt.label, scaled))
+            m1, m2, m3, m4 = st.columns(4)
+            m1.metric("Energi", f"{scaled['calories']} kkal")
+            m2.metric("Protein", f"{scaled['proteins']} g")
+            m3.metric("Lemak", f"{scaled['fat']} g")
+            m4.metric("Karbohidrat", f"{scaled['carbohydrate']} g")
+        else:
+            st.info(f"Ketik nama makanan yang terdaftar untuk menghitung takaran {selected_opt.label}.")
+
+
+def _render_recipe_generator(
+    llm_client: Any,
+    model_name: str,
+    db_path: str = "",
+) -> None:
     """Render the ingredient-based healthy recipe generator tab with diet filters."""
     st.header("🍳 Masak Apa Hari Ini?")
     st.write(
@@ -306,6 +384,29 @@ def _render_recipe_generator(llm_client: Any, model_name: str) -> None:
         placeholder="Contoh: ayam, brokoli, bawang putih",
         key="recipe_ingredients",
     )
+
+    # Show authentic Indonesian regional recipes matching pantry items if database is available
+    if db_path and ingredients.strip():
+        pantry_list = [x.strip() for x in ingredients.split(",") if x.strip()]
+        matched_recipes = find_recipes_by_pantry_ingredients(pantry_list, limit=3, db_path=db_path)
+        if matched_recipes:
+            st.markdown("##### 📖 Resep Nusantara Otentik yang Cocok dengan Bahan Anda:")
+            for rec in matched_recipes:
+                with st.expander(
+                    f"🍲 {rec.name} ({rec.origin_region}) — ~{rec.calories_per_serving:.0f} kkal/porsi "
+                    f"({rec.match_percentage:.0f}% Bahan Cocok)",
+                    expanded=False,
+                ):
+                    st.caption(
+                        f"⏱️ Waktu: {rec.prep_time_minutes} mnt | Porsi: {rec.servings} org | 🏷️ {rec.health_tags}"
+                    )
+                    st.write("**Bahan-Bahan:**")
+                    for ing in rec.matched_ingredients:
+                        st.markdown(f"- ✅ **{ing}** *(Tersedia)*")
+                    for ing in rec.missing_ingredients:
+                        st.markdown(f"- ⚪ {ing} *(Pelengkap/Bumbu)*")
+                    st.write("**Langkah Memasak Otentik:**")
+                    st.write(rec.instructions_text)
     diet_pref = st.selectbox(
         "Preferensi Diet / Kondisi Kesehatan:",
         [
@@ -634,6 +735,135 @@ def _render_food_comparison(db_path: str) -> None:
         ).set_index("Nutrisi")
         st.bar_chart(chart_data)
 
+        # Interactive Household Serving Size (URT) Comparison
+        with st.expander("🥄 Hitung Perbandingan Berdasarkan Takaran Porsi Piring (URT)", expanded=False):
+            st.write("Bandingkan makanan berdasarkan takaran porsi lazim santap (bukan hanya 100 gram).")
+            opts1 = get_serving_options(f1["name"])
+            opts2 = get_serving_options(f2["name"])
+            cu1, cu2 = st.columns(2)
+            with cu1:
+                sel1_label = st.selectbox(
+                    f"Takaran {f1['name']}:",
+                    [opt.label for opt in opts1],
+                    key="comp_urt1_sel",
+                )
+                opt1 = next((o for o in opts1 if o.label == sel1_label), opts1[0])
+                scaled1 = calculate_nutrition_for_serving(
+                    float(f1["calories"]), float(f1["proteins"]), float(f1["fat"]), float(f1["carbohydrate"]), opt1.grams
+                )
+            with cu2:
+                sel2_label = st.selectbox(
+                    f"Takaran {f2['name']}:",
+                    [opt.label for opt in opts2],
+                    key="comp_urt2_sel",
+                )
+                opt2 = next((o for o in opts2 if o.label == sel2_label), opts2[0])
+                scaled2 = calculate_nutrition_for_serving(
+                    float(f2["calories"]), float(f2["proteins"]), float(f2["fat"]), float(f2["carbohydrate"]), opt2.grams
+                )
+
+            cu_m1, cu_m2 = st.columns(2)
+            with cu_m1:
+                st.write(f"**{f1['name']} ({opt1.label}):**")
+                st.write(f"🔥 {scaled1['calories']} kkal | 🍗 {scaled1['proteins']}g Prot | 🥑 {scaled1['fat']}g Lemak | 🍚 {scaled1['carbohydrate']}g Karbo")
+            with cu_m2:
+                st.write(f"**{f2['name']} ({opt2.label}):**")
+                st.write(f"🔥 {scaled2['calories']} kkal | 🍗 {scaled2['proteins']}g Prot | 🥑 {scaled2['fat']}g Lemak | 🍚 {scaled2['carbohydrate']}g Karbo")
+
+
+def _render_packaged_foods(db_path: str) -> None:
+    """Render search and Nutri-Score explorer for Indonesian packaged foods (FMCG)."""
+    st.header("📦 Produk Kemasan & Nutri-Score (FMCG)")
+    st.write(
+        "Cek kandungan gizi produk kemasan supermarket & minimarket Indonesia berdasarkan label resmi BPOM. "
+        "Dilengkapi sistem pemeringkatan **Nutri-Score** (A = Paling Sehat hingga E = Konsumsi Dibatasi)."
+    )
+
+    categories = ["Semua Kategori"] + get_packaged_categories(db_path)
+    c1, c2, c3 = st.columns([3, 2, 2])
+    with c1:
+        pkg_query = st.text_input(
+            "Cari Produk atau Merek:",
+            placeholder="Contoh: Indomie, Ultra Milk, Bear Brand, Roma, Quaker",
+            key="pkg_search_query",
+        )
+    with c2:
+        selected_cat = st.selectbox("Kategori Produk:", categories, key="pkg_cat_filter")
+    with c3:
+        selected_score = st.selectbox(
+            "Filter Nutri-Score:",
+            ["Semua Peringkat", "A (Paling Sehat)", "B (Sehat)", "C (Sedang)", "D (Tinggi Gula/Lemak)", "E (Konsumsi Dibatasi)"],
+            key="pkg_score_filter",
+        )
+
+    score_char = ""
+    if "A" in selected_score:
+        score_char = "A"
+    elif "B" in selected_score:
+        score_char = "B"
+    elif "C" in selected_score:
+        score_char = "C"
+    elif "D" in selected_score:
+        score_char = "D"
+    elif "E" in selected_score:
+        score_char = "E"
+
+    cat_filter = "" if selected_cat == "Semua Kategori" else selected_cat
+
+    results = search_packaged_foods(
+        query=pkg_query,
+        category=cat_filter,
+        nutri_score=score_char,
+        limit=20,
+        db_path=db_path,
+    )
+
+    st.markdown(f"**Menemukan {len(results)} produk kemasan:**")
+    if not results:
+        st.info("Tidak ada produk kemasan yang cocok dengan kata kunci atau filter yang dipilih.")
+        return
+
+    for item in results:
+        score = str(item.get("nutri_score", "C")).upper()
+        badge_class = f"nutri-{score.lower()}"
+        with st.container():
+            st.markdown(
+                f"""
+                <div class="fmcg-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 1.15rem; font-weight: 700; color: #f8fafc;">{item['name']}</span>
+                        <span class="nutri-score-pill {badge_class}">Nutri-Score {score}</span>
+                    </div>
+                    <div style="color: #94a3b8; font-size: 0.88rem; margin-bottom: 8px;">
+                        🏷️ Merek: <b>{item['brand']}</b> | Kategori: <b>{item['category']}</b> | Takaran Saji: <b>{item['serving_unit']}</b>
+                    </div>
+                    <div style="color: #cbd5e1; font-size: 0.92rem; margin-bottom: 8px;">
+                        {item['description']}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+            col1, col2, col3, col4, col5 = st.columns(5)
+            col1.metric("Energi / Saji", f"{item['calories']:.0f} kkal")
+            col2.metric("Protein", f"{item['proteins']:.1f} g")
+            col3.metric("Gula", f"{item['sugars']:.1f} g")
+            col4.metric("Lemak Jenuh", f"{item['saturated_fat']:.1f} g")
+            col5.metric("Natrium (Garam)", f"{item['sodium_mg']:.0f} mg")
+
+            # Health warnings for extreme nutrients
+            warnings = []
+            if float(item["sugars"]) >= 15.0:
+                warnings.append("⚠️ **Tinggi Gula:** Mengandung ≥15g gula per saji, batasi jika mengontrol berat badan/diabetes.")
+            if float(item["sodium_mg"]) >= 800.0:
+                warnings.append("⚠️ **Tinggi Garam/Natrium:** Mengandung ≥800mg natrium per saji, waspadai jika memiliki hipertensi.")
+            if float(item["saturated_fat"]) >= 5.0:
+                warnings.append("⚠️ **Tinggi Lemak Jenuh:** Mengandung ≥5g lemak jenuh per saji.")
+            if warnings:
+                for w in warnings:
+                    st.caption(w)
+            st.markdown("---")
+
 
 def _render_healthy_alternatives(llm_client: Any, model_name: str) -> None:
     """Render the healthy ingredient substitution tab."""
@@ -771,6 +1001,8 @@ def main() -> None:
         st.stop()
 
     sqlite_count = get_nutrition_count(settings.db_path)
+    packaged_count = get_packaged_nutrition_count(settings.db_path)
+    recipes_count = get_recipes_count(settings.db_path)
     chroma_count = get_collection_count(chroma_client, embedding_fn)
 
     menu_options = [
@@ -778,6 +1010,7 @@ def main() -> None:
         "Masak Apa Hari Ini?",
         "Perencana Menu Mingguan",
         "Bandingkan Makanan",
+        "Produk Kemasan & Nutri-Score",
         "Alternatif Sehat",
         "Index Data",
     ]
@@ -805,8 +1038,10 @@ def main() -> None:
         st.markdown("---")
         st.markdown("#### 🟢 Status Asisten")
         st.caption("✅ Terhubung & Siap Melayani")
-        st.markdown(f"📚 **Katalog Pangan:** `{sqlite_count} makanan`")
-        st.markdown("🏛️ **Rujukan:** DKBM Kemenkes RI")
+        st.markdown(f"📚 **Katalog Pangan DKBM:** `{sqlite_count} makanan`")
+        st.markdown(f"📦 **Produk Kemasan FMCG:** `{packaged_count} produk`")
+        st.markdown(f"🍲 **Resep Otentik:** `{recipes_count} masakan`")
+        st.markdown("🏛️ **Rujukan:** DKBM Kemenkes RI & BPOM")
 
         if sqlite_count == 0 or chroma_count == 0:
             st.warning("Data belum diindeks. Buka menu 'Index Data' untuk memuat dataset nutrisi.")
@@ -816,7 +1051,9 @@ def main() -> None:
             st.write(f"**Model LLM:** `{settings.model_llm}`")
             st.write(f"**Model Embedding:** `{settings.model_embedding}`")
             st.write(f"**Endpoint:** `{settings.base_url}`")
-            st.write(f"**Database SQLite:** {sqlite_count} item")
+            st.write(f"**Database SQLite:** {sqlite_count} item pangan")
+            st.write(f"**Produk Kemasan:** {packaged_count} produk")
+            st.write(f"**Resep Nusantara:** {recipes_count} resep")
             st.write(f"**Index Vektor:** {chroma_count} dokumen")
 
     if menu_selection == "Tanya Gizi":
@@ -828,11 +1065,17 @@ def main() -> None:
             model_name=settings.model_llm,
         )
     elif menu_selection == "Masak Apa Hari Ini?":
-        _render_recipe_generator(llm_client=llm_client, model_name=settings.model_llm)
+        _render_recipe_generator(
+            llm_client=llm_client,
+            model_name=settings.model_llm,
+            db_path=str(settings.db_path),
+        )
     elif menu_selection == "Perencana Menu Mingguan":
         _render_weekly_planner(llm_client=llm_client, model_name=settings.model_llm)
     elif menu_selection == "Bandingkan Makanan":
         _render_food_comparison(db_path=str(settings.db_path))
+    elif menu_selection == "Produk Kemasan & Nutri-Score":
+        _render_packaged_foods(db_path=str(settings.db_path))
     elif menu_selection == "Alternatif Sehat":
         _render_healthy_alternatives(llm_client=llm_client, model_name=settings.model_llm)
     elif menu_selection == "Index Data":

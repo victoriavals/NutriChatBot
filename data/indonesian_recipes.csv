@@ -1,0 +1,120 @@
+id,name,origin_region,category,prep_time_minutes,servings,ingredients_json,instructions_text,calories_per_serving,protein_g,fat_g,carb_g,health_tags
+1,Soto Ayam Lamongan Bening,Jawa Timur,Sup & Soto,40,4,"[""500g dada ayam fillet"", ""100g bihun seduh"", ""2 butir telur rebus"", ""50g tauge rebus"", ""2 batang serai memar"", ""4 lembar daun jeruk"", ""1 sdt garam"", ""1 sdt merica""]","1. Rebus dada ayam dengan serai, daun salam, dan daun jeruk hingga empuk. Angkat dan suwir ayam.
+2. Haluskan bawang putih, bawang merah, kunyit, jahe, dan kemiri. Tumis dengan sedikit minyak lalu masukkan ke kuah kaldu.
+3. Susun bihun, tauge, dan ayam suwir di mangkuk.
+4. Siram dengan kuah soto panas dan sajikan dengan perasan jeruk nipis.",240.0,26.0,5.0,22.0,"Tinggi Protein, Rendah Lemak, Bebas Santan"
+2,Rawon Daging Sapi Sehat,Jawa Timur,Sup & Soto,60,5,"[""400g daging sapi sengkel rendah lemak"", ""4 buah kluwek tua rendam air hangat"", ""6 butir bawang merah"", ""4 siung bawang putih"", ""2 batang serai"", ""50g tauge pendek""]","1. Rebus potongan daging sengkel hingga empuk. Sisihkan air kaldu.
+2. Haluskan isi kluwek bersama bawang, ketumbar, dan jahe. Tumis hingga harum berminyak hitam.
+3. Masukkan tumisan bumbu ke dalam rebusan kaldu daging.
+4. Masak dengan api kecil hingga bumbu meresap.
+5. Sajikan hangat dengan tauge pendek segar dan sambal terasi.",290.0,28.0,11.0,18.0,"Tinggi Protein, Sumber Zat Besi, Tanpa Santan"
+3,Sayur Asem Jakarta Segar,Betawi,Sup & Soto,30,4,"[""1 buah jagung manis potong"", ""50g kacang panjang"", ""50g labu siam"", ""30g kacang tanah"", ""2 lembar daun salam"", ""3 buah asam jawa"", ""1 sdm gula merah"", ""1 sdt garam""]","1. Didihkan air bersama asam jawa, daun salam, dan lengkuas.
+2. Masukkan jagung manis dan kacang tanah terlebih dahulu hingga setengah matang.
+3. Masukkan bumbu halus (bawang merah, cabai merah, terasi sedikit).
+4. Tambahkan labu siam dan kacang panjang, masak hingga sayuran matang renyah.
+5. Sajikan segar sebagai pelengkap makan siang.",110.0,4.0,2.0,21.0,"Rendah Kalori, Tinggi Serat, Ramah Jantung"
+4,Sup Ikan Gurame Kuah Bening,Sunda,Sup & Soto,30,3,"[""1 ekor (500g) ikan gurame segar potong"", ""2 buah tomat hijau potong"", ""1 batang serai"", ""2 lembar daun jeruk"", ""1 ikat kemangi"", ""3 siung bawang putih iris"", ""1 sdt garam""]","1. Lumuri potongan ikan gurame dengan air jeruk nipis dan garam selama 15 menit, lalu cuci bersih.
+2. Didihkan air, masukkan irisan bawang putih, jahe, serai, dan daun jeruk.
+3. Masukkan ikan gurame, masak dengan api sedang hingga daging ikan matang lembut.
+4. Masukkan potongan tomat hijau dan daun kemangi menjelang diangkat.
+5. Sajikan selagi hangat tanpa bau amis.",185.0,24.0,4.0,12.0,"Tinggi Protein, Rendah Lemak, Sangat Rendah Kolesterol"
+5,Sayur Bening Bayam Jagung Manis,Jawa Tengah,Sup & Soto,20,3,"[""2 ikat bayam petik daun"", ""1 buah jagung manis pipil"", ""4 butir bawang merah iris"", ""2 ruas temu kunci memar"", ""1 sdt garam"", ""1 sdt gula pasir""]","1. Didihkan air bersama irisan bawang merah dan temu kunci hingga harum.
+2. Masukkan jagung manis, masak hingga matang dan empuk.
+3. Masukkan daun bayam segar, masak sebentar saja (1-2 menit) agar nutrisi dan warna hijau terjaga.
+4. Bumbui dengan garam dan sedikit gula, aduk rata lalu matikan api.",75.0,3.5,0.5,15.0,"Rendah Kalori, Tinggi Zat Besi, Ramah Diabetes"
+6,Coto Makassar Kuah Rempah Alami,Sulawesi Selatan,Sup & Soto,50,4,"[""400g daging sapi tanpa lemak"", ""50g kacang tanah sangrai haluskan"", ""2 batang serai"", ""5 siung bawang putih"", ""1 sdt ketumbar sangrai"", ""1 sdt jintan""]","1. Rebus daging sapi dengan serai dan daun salam hingga empuk. Potong dadu.
+2. Haluskan bawang putih, ketumbar, jintan, dan lengkuas, tumis sebentar.
+3. Masukkan bumbu halus dan kacang tanah halus ke dalam kuah kaldu daging.
+4. Masak hingga kuah mengental harum gurih alami tanpa santan.",270.0,27.0,10.0,16.0,"Tinggi Protein, Sumber Energi Rempah, Tanpa Santan"
+7,Sup Brenebon Kacang Merah Manado,Sulawesi Utara,Sup & Soto,45,4,"[""150g kacang merah rendam"", ""200g daging sapi sandung lamur potong"", ""1/2 butir pala bubuk"", ""4 siung bawang putih geprek"", ""2 batang daun bawang iris"", ""1 sdt merica""]","1. Rebus kacang merah hingga empuk bersama potongan daging sapi.
+2. Masukkan bawang putih tumis, pala bubuk, dan merica.
+3. Masak hingga kuah kaldu menyatu dan kacang merah mekar lembut.
+4. Taburi daun bawang segar sebelum disajikan.",220.0,18.0,6.0,24.0,"Tinggi Serat Alami, Sumber Besi, Ramah Kolesterol"
+8,Ikan Kuah Asam Manado,Sulawesi Utara,Sup & Soto,30,3,"[""400g ikan kakap atau tongkol fillet"", ""2 buah tomat merah potong"", ""5 buah cabai rawit utuh"", ""1 batang serai"", ""1 ikat kemangi"", ""2 sdm air perasan lemon""]","1. Didihkan air dengan serai, jahe, daun kunyit, dan daun jeruk.
+2. Masukkan potongan ikan segar, masak hingga mendidih dan ikan berubah warna.
+3. Tambahkan air perasan lemon, potongan tomat, dan cabai rawit utuh.
+4. Masukkan daun kemangi sesaat sebelum diangkat untuk aroma segar.",160.0,25.0,3.0,8.0,"Tinggi Protein, Rendah Kalori, Ramah Hipertensi"
+9,Pepes Tahu Jamur Kemangi,Sunda,Kukus & Pepes,35,4,"[""300g tahu putih haluskan"", ""100g jamur tiram suwir"", ""1 butir telur kocok"", ""1 ikat daun kemangi"", ""4 lembar daun pisang bungkus"", ""4 siung bawang merah"", ""2 siung bawang putih""]","1. Campurkan tahu halus, jamur suwir, telur, kemangi, dan bumbu halus.
+2. Bungkus adonan tahu dalam daun pisang, semat kedua ujungnya dengan lidi.
+3. Kukus selama 25 menit hingga matang sempurna dan aroma daun pisang meresap.
+4. Dapat dipanggang sebentar di teflon kering untuk aroma smoky.",125.0,10.0,4.5,11.0,"Vegetarian Sehat, Tinggi Kalsium, Rendah Lemak"
+10,Pepes Ikan Mas Bumbu Kuning,Jawa Barat,Kukus & Pepes,45,3,"[""500g ikan mas bersih utuh"", ""2 ikat kemangi"", ""4 siung bawang merah"", ""3 siung bawang putih"", ""2 ruas kunyit bakar"", ""3 butir kemiri"", ""daun pisang""]","1. Haluskan bawang, kunyit, kemiri, dan cabai merah.
+2. Balurkan bumbu kuning ke seluruh badan dan rongga perut ikan mas bersama daun kemangi.
+3. Bungkus rapi dengan daun pisang.
+4. Kukus selama 40 menit dengan api sedang hingga bumbu meresap ke dalam daging ikan.",210.0,26.0,7.0,9.0,"Tinggi Protein Omega-3, Bebas Minyak Goreng, Ramah Jantung"
+11,Pepes Ayam Suwir Bumbu Rujak,Jawa Timur,Kukus & Pepes,40,4,"[""400g dada ayam rebus suwir"", ""2 buah tomat iris"", ""2 lembar daun salam"", ""1 sdm air asam jawa"", ""daun pisang pembungkus""]","1. Campur ayam suwir dengan bumbu halus (bawang merah, bawang putih, cabai, ketumbar) dan tomat iris.
+2. Bungkus per porsi dalam daun pisang.
+3. Kukus selama 20 menit, lalu bakar sebentar di atas wajan anti lengket.",195.0,28.0,4.0,10.0,"Tinggi Protein, Rendah Lemak, Cocok Diet Bulking/Cutting"
+12,Sate Lilit Ikan Bali Panggang,Bali,Kukus & Pepes,35,4,"[""350g daging ikan tenggiri giling"", ""50g kelapa parut muda sangrai"", ""10 batang serai untuk tangkai sate"", ""bumbu base genep bali""]","1. Campur ikan giling dengan kelapa parut dan tumisan bumbu halus aromatik Bali.
+2. Lilitkan adonan pada batang serai hingga padat rapi.
+3. Panggang di atas teflon atau grill pan tanpa minyak hingga matang kecokelatan harum.",175.0,21.0,6.0,9.0,"Tinggi Protein, Aromatik Alami, Tanpa Penggorengan"
+13,Tumis Kangkung Bawang Putih Terasi,Nusantara,Tumis & Sayur,15,3,"[""2 ikat kangkung segar potong"", ""4 siung bawang putih cincang"", ""3 butir bawang merah iris"", ""1 sdt terasi bakar"", ""1 sdm minyak zaitun/sawit"", ""1/2 sdt garam""]","1. Panaskan 1 sendok makan minyak, tumis bawang putih, bawang merah, dan terasi hingga harum.
+2. Masukkan batang kangkung terlebih dahulu, aduk cepat dengan api besar.
+3. Masukkan daun kangkung dan 2 sendok makan air, tumis cepat selama 1-2 menit agar tetap renyah hijau.
+4. Angkat dan sajikan segera.",85.0,3.0,4.5,9.0,"Tinggi Serat, Cepat Saji (15 Menit), Ramah Diabetes"
+14,Orek Tempe Basah Manis Gurih,Jawa,Tumis & Sayur,25,4,"[""300g tempe potong korek api"", ""2 sdm kecap manis rendah gula"", ""3 butir bawang merah"", ""2 siung bawang putih"", ""2 buah cabai merah iris"", ""1 lembar daun salam""]","1. Panggang atau tumis tempe dengan sedikit minyak hingga setengah kering (tanpa deep fry).
+2. Tumis bawang merah, bawang putih, cabai, daun salam, dan lengkuas hingga harum.
+3. Masukkan tempe, tambahkan kecap manis dan sedikit air.
+4. Aduk hingga bumbu meresap dan kuah mengering.",160.0,14.0,6.0,16.0,"Sumber Protein Nabati, Tinggi Isoflavon, Rendah Lemak Jenuh"
+15,Capcay Kuah Sayur Komplit,Peranakan Nusantara,Tumis & Sayur,25,4,"[""100g kembang kol"", ""100g brokoli"", ""1 buah wortel iris"", ""100g dada ayam potong"", ""5 butir bakso sapi iris"", ""3 siung bawang putih geprek"", ""1 sdm saus tiram""]","1. Tumis bawang putih cincang hingga harum.
+2. Masukkan potongan dada ayam dan bakso, tumis hingga berubah warna.
+3. Masukkan wortel dan sedikit air kaldu, masak hingga setengah empuk.
+4. Tambahkan brokoli, kembang kol, sawi hijau, dan saus tiram. Masak cepat agar renyah.",155.0,16.0,3.5,14.0,"Kaya Antioksidan & Vitamin, Tinggi Serat, Ramah Keluarga"
+16,Gado-Gado Betawi Sehat,Betawi,Tumis & Sayur,30,4,"[""100g kangkung rebus"", ""100g tauge rebus"", ""1 buah labu siam rebus"", ""1 buah kentang rebus"", ""1 butir telur rebus"", ""50g tahu tempe panggang"", ""saus kacang mete/kacang tanah panggang""]","1. Rebus semua sayuran hijau dan labu siam hingga matang renyah.
+2. Haluskan kacang tanah sangrai dengan bawang putih panggang, cabai, gula merah sedikit, dan air hangat.
+3. Tata sayuran, kentang, dan telur rebus di piring saji.
+4. Siram dengan kuah saus kacang gurih.",260.0,14.0,9.0,32.0,"Tinggi Serat Pangan, Porsi Seimbang Isi Piringku"
+17,Tumis Buncis Jagung Manis Wortel,Nusantara,Tumis & Sayur,20,3,"[""150g buncis potong serong"", ""1 buah wortel potong korek api"", ""1/2 buah jagung manis pipil"", ""3 siung bawang putih cincang"", ""1 sdt minyak wijen"", ""1/2 sdt garam""]","1. Tumis bawang putih dengan sedikit minyak hingga harum.
+2. Masukkan jagung pipil dan wortel dengan 3 sdm air, masak 2 menit.
+3. Masukkan buncis, bumbui dengan garam dan sedikit minyak wijen.
+4. Masak sebentar hingga buncis matang renyah.",90.0,3.0,2.5,15.0,"Rendah Kalori, Indeks Glikemik Rendah, Ramah Diabetes"
+18,Rendang Daging Sapi Minang Rendah Santan,Sumatra Barat,Olahan Daging & Lauk,90,6,"[""500g daging sapi paha belakang bebas lemak"", ""200ml santan kelapa encer"", ""bumbu rempah rendang lengkap"", ""2 batang serai"", ""3 lembar daun kunyit""]","1. Haluskan cabai merah, bawang merah, bawang putih, jahe, dan lengkuas.
+2. Masak daging bersama bumbu halus dan daun kunyit tanpa minyak hingga air daging keluar.
+3. Masukkan santan encer, aduk perlahan dengan api sedang hingga mendidih.
+4. Kecilkan api dan masak perlahan hingga kuah mengering cokelat gelap meresap.",280.0,30.0,12.0,11.0,"Tinggi Protein, Padat Gizi Otentik, Lemak Terkontrol"
+19,Ayam Bakar Bumbu Rujak Tanpa Minyak,Jawa Timur,Panggang & Bakar,45,4,"[""500g dada ayam potong 4"", ""4 lembar daun jeruk"", ""2 batang serai"", ""bumbu halus cabai merah, bawang, kemiri, gula merah sedikit""]","1. Ungkep ayam bersama bumbu halus, serai, daun salam, dan daun jeruk dengan sedikit air hingga bumbu meresap dan ayam matang empuk.
+2. Angkat ayam, tiriskan sisa bumbu kental.
+3. Bakar ayam di atas teflon atau panggangan sambil diolesi sisa bumbu ungkep hingga harum kecokelatan.",225.0,32.0,5.0,10.0,"Tinggi Protein, Sangat Rendah Lemak, Pilihan Utama Diet"
+20,Ayam Bakar Taliwang Pedas,Nusa Tenggara Barat,Panggang & Bakar,40,4,"[""500g ayam kampung/pejantan muda belah dua"", ""6 butir bawang merah"", ""4 siung bawang putih"", ""5 buah cabai merah"", ""1 sdt terasi lombok bakar"", ""1 sdm perasan jeruk limau""]","1. Haluskan bumbu cabai, bawang, kencur, dan terasi bakar.
+2. Lumuri ayam dengan bumbu halus dan sedikit minyak kelapa.
+3. Panggang ayam sambil dibolak-balik dan diolesi bumbu hingga matang harum pedas menggugah selera.
+4. Beri perasan jeruk limau sebelum dinikmati.",230.0,30.0,7.0,8.0,"Tinggi Protein, Menggugah Metabolisme, Rendah Gula"
+21,Ayam Pop Padang Kukus Rebus,Sumatra Barat,Olahan Daging & Lauk,40,4,"[""500g ayam kampung kupas kulit"", ""4 siung bawang putih haluskan"", ""2 cm jahe parut"", ""200ml air kelapa murni"", ""1 sdt garam""]","1. Rebus ayam tanpa kulit dalam air kelapa murni bersama bawang putih, jahe, dan garam hingga empuk dan air kelapa meresap.
+2. Celupkan ayam sebentar saja (5 detik) ke minyak hangat agar berkilau, atau sajikan langsung rebusan.
+3. Nikmati dengan sambal tomat rebus pedas manis khas Minang.",200.0,29.0,4.0,7.0,"Tinggi Protein, Sangat Rendah Kolesterol, Tradisional Sehat"
+22,Opor Ayam Putih Kuah Santan Encer,Jawa Tengah,Olahan Daging & Lauk,45,4,"[""500g dada ayam potong"", ""300ml santan encer"", ""1 batang serai"", ""3 lembar daun jeruk"", ""1 sdt ketumbar sangrai bubuk"", ""bawang putih dan merah halus""]","1. Tumis bumbu putih (bawang merah, putih, kemiri, ketumbar) dengan 1 sdt minyak hingga wangi.
+2. Masukkan ayam, aduk hingga kaku.
+3. Tuang santan encer, serai, dan daun jeruk.
+4. Masak dengan api kecil hingga ayam matang empuk dan kuah menyatu gurih lembut.",235.0,28.0,8.0,9.0,"Tinggi Protein, Santan Terkendali, Nyaman di Lambung"
+23,Tahu Telur Bumbu Kacang Surabaya,Jawa Timur,Olahan Daging & Lauk,25,2,"[""150g tahu putih potong dadu"", ""2 butir telur kocok lepas"", ""50g tauge seduh"", ""2 sdm saus kacang tanah panggang dengan sedikit petis"", ""irisan seledri""]","1. Campur tahu dadu ke dalam kocokan telur yang sudah dibumbui sedikit garam dan merica.
+2. Dadar di teflon anti lengket dengan sedikit minyak hingga matang renyah keemasan.
+3. Letakkan di piring, beri tauge seduh di atasnya.
+4. Siram dengan saus kacang petis encer dan taburan seledri.",285.0,20.0,13.0,22.0,"Tinggi Protein Lengkap, Cepat Masak, Sumber Kalsium"
+24,Ikan Bakar Colo-Colo Maluku,Maluku,Panggang & Bakar,30,3,"[""450g ikan kembung atau kakap utuh"", ""sambal colo-colo: tomat merah, cabai rawit, bawang merah iris, perasan jeruk nipis, kecap manis sedikit""]","1. Bersihkan ikan, lumuri dengan jeruk nipis dan garam.
+2. Panggang ikan di atas grill teflon hingga kedua sisi matang sempurna tanpa gosong.
+3. Campur semua bahan sambal colo-colo segar mentah.
+4. Siramkan sambal segar di atas ikan bakar panas.",190.0,27.0,4.5,9.0,"Tinggi Asam Lemak Sehat, Segar Tanpa Minyak, Rendah Kalori"
+25,Pepes Telur Asin Tahu Jamur,Brebes / Jawa Tengah,Kukus & Pepes,30,3,"[""2 butir telur asin mentah"", ""200g tahu putih haluskan"", ""50g jamur tiram"", ""daun kemangi"", ""daun pisang""]","1. Campurkan tahu halus, jamur tiram, daun kemangi, dan irisan cabai.
+2. Letakkan sebagian adonan tahu di atas daun pisang, masukkan 1 butir telur asin di tengahnya, lalu tutup adonan tahu.
+3. Bungkus dan kukus 25 menit hingga padat matang.
+4. Rasa asin alami dari telur asin menyatu lezat tanpa perlu garam tambahan.",170.0,13.0,8.0,11.0,"Tinggi Protein, Padat Rasa Alami, Bebas Gorengan"
+26,Pecel Madiun Sayur Komplit,Jawa Timur,Tumis & Sayur,25,4,"[""100g kangkung/bayam rebus"", ""100g tauge rebus"", ""50g kacang panjang potong rebus"", ""50g bunga turi/kenikir rebus"", ""sambal bumbu pecel kencur""]","1. Rebus masing-masing sayuran secara terpisah agar tingkat kematangan pas.
+2. Larutkan sambal pecel dengan air hangat secukupnya.
+3. Tata sayuran di atas piring atau pincuk daun pisang.
+4. Siram dengan sambal pecel beraroma kencur dan daun jeruk wangi.",160.0,7.0,6.0,22.0,"Tinggi Serat, Menyehatkan Pencernaan, Ramah Jantung"
+27,Ayam Betutu Kuah Bali Sehat,Bali,Sup & Soto,60,4,"[""500g dada ayam potong"", ""bumbu base genep lengkap (kunyit, jahe, kencur, serai, cabai)"", ""2 batang serai memar"", ""4 lembar daun salam""]","1. Tumis bumbu halus khas Bali dengan 1 sdm minyak kelapa hingga wangi semerbak.
+2. Masukkan ayam, aduk hingga bumbu merata membalut daging.
+3. Tambahkan air kaldu secukupnya, masak dengan api kecil dan tutup wajan rapat.
+4. Masak hingga ayam sangat empuk dan bumbu meresap pekat.",240.0,31.0,7.0,11.0,"Tinggi Protein, Antiinflamasi Alami (Kunyit & Jahe)"
+28,Plecing Kangkung Lombok Pedas Segar,Lombok,Tumis & Sayur,15,3,"[""2 ikat kangkung lombok rebus"", ""50g tauge rebus"", ""sambal plecing: cabai rawit, tomat bakar, terasi lombok, perasan jeruk limau, garam""]","1. Rebus kangkung sebentar, lalu suwir-suwir memanjang batangnya.
+2. Haluskan cabai, tomat bakar, terasi, dan garam, lalu beri perasan air jeruk limau segar.
+3. Tata kangkung dan tauge di piring, tuang sambal plecing di atasnya.
+4. Taburi sedikit kacang tanah sangrai.",80.0,3.5,2.0,13.0,"Sangat Rendah Kalori, Kaya Antioksidan, Membakar Metabolisme"
+29,Ikan Arsik Batak Bumbu Andaliman,Sumatra Utara,Olahan Daging & Lauk,45,4,"[""500g ikan mas atau mujair segar"", ""1 sdm andaliman"", ""5 batang lokio/bawang batak"", ""3 buah asam gelugur"", ""kunyit, jahe, lengkuas""]","1. Alasi wajan dengan serai, asam gelugur, dan lokio.
+2. Letakkan ikan segar di atasnya, balurkan bumbu halus kunyit dan andaliman.
+3. Tuang air hingga ikan terendam setengah.
+4. Masak dengan api kecil hingga air menyusut habis dan bumbu meresap sempurna.",205.0,27.0,6.0,9.0,"Tinggi Protein, Sensasi Andaliman Otentik, Tanpa Minyak"
+30,Tinutuan Bubur Manado Sayur Sehat,Sulawesi Utara,Sup & Soto,35,4,"[""100g beras"", ""100g labu kuning potong dadu"", ""50g ubi jalar potong dadu"", ""1 buah jagung manis sisir"", ""1 ikat bayam"", ""1 ikat kangkung"", ""daun kemangi""]","1. Rebus beras bersama air hingga menjadi bubur encer.
+2. Masukkan labu kuning, ubi jalar, dan jagung manis, masak hingga empuk dan bubur mengental kuning alami.
+3. Masukkan sayuran kangkung, bayam, dan kemangi sesaat sebelum matang.
+4. Bumbui dengan garam, nikmati hangat dengan sambal dabu-dabu.",190.0,5.0,1.5,40.0,"Kaya Beta-Karoten, Tinggi Serat, Ramah Lambung & Lansia"

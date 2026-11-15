@@ -6,7 +6,7 @@
 [![AI Provider](https://img.shields.io/badge/AI-SumoPod%20AI%20%2F%20GLM--5.3--flash-orange.svg)](https://ai.sumopod.com/)
 [![Vector DB](https://img.shields.io/badge/Vector%20DB-ChromaDB-green.svg)](https://www.trychroma.com/)
 [![Database](https://img.shields.io/badge/Database-SQLite3-003B57.svg)](https://www.sqlite.org/)
-[![Tests](https://img.shields.io/badge/tests-51%2F51%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-68%2F68%20passing-brightgreen.svg)](tests/)
 [![Code Style: Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Docker](https://img.shields.io/badge/docker-ready-2496ED.svg)](Dockerfile)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -47,6 +47,9 @@
 **NutriChatBot** adalah platform asisten nutrisi berbasis kecerdasan buatan yang dikembangkan khusus untuk menjawab tantangan gizi masyarakat Indonesia. Alih-alih mengandalkan model bahasa generik (*Large Language Model*) yang kerap mengalami halusinasi dan minim konteks masakan nusantara, NutriChatBot menggabungkan:
 
 - **1.346 Komposisi Pangan Terverifikasi**: Merujuk pada standar resmi Daftar Komposisi Bahan Makanan (DKBM) Kementerian Kesehatan RI per 100 gram bagian yang dapat dimakan (BDD).
+- **60 Produk Pangan Kemasan Ritel & FMCG (Open Food Facts & BPOM)**: Basis data produk kemasan harian supermarket/minimarket Indonesia lengkap dengan informasi Gula, Lemak Jenuh, Natrium, dan peringkat resmi **Nutri-Score (A–E)**.
+- **30 Pustaka Resep Masakan Nusantara Otentik**: Menampilkan resep tradisional nusantara lengkap dengan porsi saji, takaran bahan, langkah memasak terstruktur, dan profil gizi per porsi.
+- **Modul Konversi Ukuran Rumah Tangga (URT)**: Menerjemahkan takaran 100 gram laboratorium menjadi takaran piring makan sehari-hari (*1 centong nasi*, *1 butir telur*, *1 potong ayam*, *1 piring*, *1 sdm*).
 - **Dual-Engine Hybrid Retrieval ($wRRF$)**: Memadukan pencarian kata kunci eksak SQLite dengan pencarian semantik vektor ChromaDB (`text-embedding-3-small`).
 - **Inferensi Model Penalaran GLM-5.3-flash**: Menggunakan gateway SumoPod AI via OpenAI-compatible SDK dengan kemampuan streaming respon kata demi kata (*token-by-token*).
 - **Kalkulator Kalori & Makronutrisi Standar Medis**: Mengimplementasikan formula Mifflin-St Jeor yang tervalidasi klinis oleh *American Dietetic Association* (ADA).
@@ -65,9 +68,11 @@
   - 🥑 *Lemak Sehat Alpukat*
   - 🥗 *Camilan Sehat Rendah Gula*
 - **Transparansi Rujukan Gizi**: Setiap jawaban menyertakan rujukan komposisi nutrisi di dalam expander `📚 Rujukan Data Nutrisi`.
+- **Kalkulator Porsi Rumah Tangga (URT)**: Mengubah takaran 100 gram menjadi takaran piring makan sehari-hari (*1 centong*, *1 butir*, *1 potong*, *1 piring*) secara instan.
 
-### 2. 🍳 Masak Apa Hari Ini? (Generator Resep Sehat)
-- **Pemanfaatan Bahan Dapur**: Rekomendasi resep masakan bernutrisi lengkap dengan estimasi kalori dan makronutrisi dari bahan yang tersedia di kulkas.
+### 2. 🍳 Masak Apa Hari Ini? (Generator Resep Sehat & Resep Nusantara Otentik)
+- **Pencocokan Resep Nusantara Otentik**: Menampilkan rekomendasi masakan khas daerah (Soto Lamongan, Rawon, Sayur Asem, Pepes Tahu, Ayam Bakar Rujak) yang cocok dengan bahan di kulkas, lengkap dengan langkah memasak teruji.
+- **Pemanfaatan Bahan Dapur via AI**: Rekomendasi resep masakan bernutrisi lengkap dengan estimasi kalori dan makronutrisi dari bahan yang tersedia.
 - **Preset Pilihan Bahan Cepat**: Tombol praktis *Ayam + Brokoli*, *Tahu + Tempe + Bayam*, atau *Ikan + Tomat*.
 - **Filter Kondisi Kesehatan & Diet Khusus**:
   - *Biasa (Gizi Seimbang)*
@@ -86,17 +91,24 @@
   - Pembagian porsi seimbang konsep **Isi Piringku**: Protein 25%, Lemak Sehat 25%, dan Karbohidrat Kompleks 50%.
 - **Unduh Menu**: Simpan rencana menu mingguan ke dalam format Markdown (`.md`).
 
-### 4. 📊 Bandingkan Makanan (Visual Nutrient Comparison)
+### 4. 📊 Bandingkan Makanan (Visual Nutrient & URT Comparison)
 - **Komparasi Berdampingan**: Menampilkan data kalori, protein, lemak, dan karbohidrat antara dua makanan secara instan.
+- **Penyesuaian Porsi Rumah Tangga (URT)**: Mampu membandingkan takaran saji nyata (misal: *1 butir telur ~55g* vs *1 potong tempe ~50g*).
 - **Contoh Preset Populer**: Tombol sekali klik untuk *Tempe vs Tahu*, *Beras Putih vs Merah*, *Dada Ayam vs Sapi*, *Telur vs Ikan*.
 - **Kartu Kesimpulan Cepat (*Quick Takeaway*)**: Penanda otomatis siapa yang **Lebih Rendah Kalori** (penghematan kkal) dan siapa yang **Lebih Tinggi Protein** (keunggulan gram).
 - **Grafik Interaktif Altair**: Visualisasi grafik batang untuk perbandingan makronutrisi.
 
-### 5. 🥗 Alternatif Sehat
+### 5. 📦 Produk Kemasan & Nutri-Score (FMCG Explorer)
+- **Database Produk Kemasan Populer**: Mencakup 60 produk minimarket/supermarket Indonesia (Indomie, Ultra Milk, Bear Brand, Roma, Quaker, Cimory, Pocari Sweat, Chitato, dll.).
+- **Informasi Label Resmi BPOM**: Menyajikan takaran saji, Gula Tambahan, Lemak Jenuh, Natrium/Garam, dan Kalori per saji.
+- **Peringkat Mutu Nutri-Score (A–E)**: Visualisasi lencana Nutri-Score dari Grade A (paling sehat) hingga Grade E (konsumsi dibatasi).
+- **Peringatan Batas Sehat Otomatis**: Mendeteksi dan memberi tanda peringatan jika produk tinggi gula ($\ge 15\text{g}$), tinggi garam ($\ge 800\text{mg}$), atau tinggi lemak jenuh.
+
+### 6. 🥗 Alternatif Sehat
 - **Pencari Substitusi Bahan**: Menemukan bahan pengganti yang lebih padat gizi untuk bahan tinggi kalori atau rendah nutrisi.
 - **Chip Bahan Favorit**: Pilihan cepat untuk bahan yang sering ingin diganti: *Gula Pasir*, *Minyak Kelapa Sawit*, *Santan Kental*, dan *Tepung Terigu*.
 
-### 6. 🛡️ Guardrail Keselamatan Medis (Clinical Safety)
+### 7. 🛡️ Guardrail Keselamatan Medis (Clinical Safety)
 - **Deteksi Komorbiditas Otomatis**: Memindai kata kunci risiko (diabetes, hipertensi, ginjal, asam urat) pada kueri dan menyuntikkan instruksi kehati-hatian klinis pada prompt AI.
 - **Disclaimer Medis Wajib**: Setiap rekomendasi diet dan resep secara otomatis menyertakan peringatan edukatif resmi agar pengguna berkonsultasi dengan dokter gizi klinis (Sp.GK).
 
@@ -368,33 +380,49 @@ Buka peramban di `http://localhost:8501`.
 Seluruh fungsi aplikasi diverifikasi secara ketat melalui piramida pengujian otomatis:
 
 ```bash
-# Jalankan seluruh 51 automated tests (unit, integrasi, dan headless UI)
+# Jalankan seluruh 68 automated tests (unit, integrasi, dan headless UI)
 uv run pytest -v
 
 # Jalankan linter dan format check menggunakan Ruff
 uv run ruff check .
 
 # Jalankan kompilasi sintaks Python
-uv run python -m py_compile app.py config.py embeddings.py services/*.py scripts/*.py
+python -c "import py_compile, glob; [py_compile.compile(f, doraise=True) for f in glob.glob('**/*.py', recursive=True) if '.venv' not in f]"
 ```
 
-### Ringkasan Cakupan Uji (51 Passed):
+### Ringkasan Cakupan Uji (68 Passed, 100% Lulus):
 - `tests/test_nutrition_calc.py` (10 tests): Validasi formula Mifflin-St Jeor, batas numerik biometrik, rasio makro kalori.
+- `tests/test_serving_size.py` (8 tests): Konversi takaran porsi rumah tangga (URT), pola taksonomi pangan, dan scaling gizi.
+- `tests/test_packaged_nutrition.py` (4 tests): Operasi database produk kemasan, pemfilteran Nutri-Score, dan inisialisasi CSV.
+- `tests/test_recipe_service.py` (5 tests): Pencocokan bahan dapur dengan resep nusantara otentik dan prompt adaptasi resep.
 - `tests/test_database.py` (9 tests): Sanitasi parameter SQLi, deteksi anomali gizi, ekstraksi stopword.
 - `tests/test_embeddings.py` (8 tests): Sanitasi nilai NaN, batching ChromaDB, algoritma fusi wRRF.
 - `tests/test_llm.py` (15 tests): Streaming generator, proteksi token rahasia, guardrail komorbiditas klinis.
-- `tests/test_app_ui.py` (3 tests): Simulasi headless siklus hidup antarmuka Streamlit via `AppTest`.
+- `tests/test_app_ui.py` (3 tests): Simulasi headless siklus hidup antarmuka Streamlit (seluruh 7 menu) via `AppTest`.
 - `tests/test_config.py` (4 tests): Pembacaan `.env` dan filter sensor logging.
-- `tests/test_data_integrity.py` (2 tests): Integritas struktur 1.346 record CSV pangan Indonesia.
+- `tests/test_data_integrity.py` (2 tests): Integritas struktur CSV pangan Indonesia.
 
 ---
 
 ## 📊 Basis Data & Asal Data Pangan
 
-- **Total Record**: 1.346 bahan makanan dan hidangan khas Indonesia.
-- **Standar Porsi**: 100 gram Bagian yang Dapat Dimakan (BDD / *Edible Portion*).
-- **Zat Gizi yang Tercakup**: Energi (Kalori), Protein, Lemak, Karbohidrat, Serat, Kalsium, Fosfor, Besi, Natrium, Kalium, Tembaga, Seng, Retinol, Beta-Karoten, Vitamin B1, B2, Niasin, dan Vitamin C.
-- **Rujukan Data**: Diadaptasi dari tabel resmi **Daftar Komposisi Bahan Makanan (DKBM) Kementerian Kesehatan RI** via dataset publik Kaggle oleh [Anas Fikri Hanif](https://www.kaggle.com/datasets/anasfikrihanif/indonesian-food-and-drink-nutrition-dataset).
+NutriChatBot memadukan 3 klaster data pangan komprehensif:
+
+1. **1.346 Bahan Pangan Dasar & Tradisional (DKBM Kemenkes RI)**:
+   - Standar porsi 100 gram Bagian yang Dapat Dimakan (BDD / *Edible Portion*).
+   - Rujukan: Tabel resmi **Daftar Komposisi Bahan Makanan (DKBM) Kementerian Kesehatan RI**.
+   - Mencakup Energi, Protein, Lemak, Karbohidrat, Serat, Kalsium, Besi, Natrium, Vitamin A, B1, B2, C.
+
+2. **60 Produk Pangan Kemasan Ritel & FMCG (Open Food Facts & BPOM)**:
+   - Mencakup produk minimarket harian Indonesia (Mie Instan, Susu UHT, Yogurt, Minuman RTD, Biskuit, Sereal, Saus/Minyak).
+   - Menyajikan Takaran Saji, Gula Tambahan, Lemak Jenuh, Natrium/Garam, dan peringkat resmi **Nutri-Score (A–E)**.
+
+3. **30 Koleksi Resep Masakan Nusantara Otentik**:
+   - Resep khas dari berbagai penjuru nusantara (Jawa, Sunda, Minang, Bali, Lombok, Manado, Maluku).
+   - Lengkap dengan porsi saji, takaran bahan riil, langkah memasak terstruktur, dan profil gizi per porsi.
+
+4. **Sistem Takaran Porsi Rumah Tangga (URT)**:
+   - Pemetaan taksonomi pangan Indonesia untuk mengonversi nilai 100 gram ke porsi nyata (*centong nasi*, *butir telur*, *potong ayam/daging*, *piring*, *sdm/sdt*).
 
 ---
 

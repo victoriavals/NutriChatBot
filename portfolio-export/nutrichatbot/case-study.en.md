@@ -191,8 +191,8 @@ $$\text{TDEE} = \text{BMR} \times \text{Activity Multiplier}$$
 The implementation has been verified through multiple rigorous testing layers:
 
 1. **Automated Pytest Suite:**
-   - **51 automated test cases** spanning UI flows, configuration, database operations, embeddings, LLM streaming, and nutrition math.
-   - **Status:** 100% PASS (exit code 0, executed in 5.85s).
+   - **68 automated test cases** spanning UI flows (all 7 views), configuration, multi-table database operations (staples, FMCG, recipes), URT scaling engine, embeddings, LLM streaming, and nutrition math.
+   - **Status:** 100% PASS (exit code 0, executed in ~6.35s).
 2. **Dedicated End-to-End QA Suite (`scratch/qa_suite_runner.py`):**
    - **18 test scenarios** covering exact Indonesian food keyword matching, SQL injection resilience with `OR 1=1` and comment syntax, log redaction of API keys, clinical risk warning injection, and BMR mathematical accuracy.
    - **Status:** 18/18 PASS (100% success rate).

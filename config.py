@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 BASE_DIR: Path = Path(__file__).resolve().parent
 DEFAULT_DB_PATH: Path = BASE_DIR / "nutrition.db"
 DEFAULT_CSV_PATH: Path = BASE_DIR / "data" / "nutrition.csv"
+DEFAULT_PACKAGED_CSV_PATH: Path = BASE_DIR / "data" / "packaged_nutrition.csv"
+DEFAULT_RECIPES_CSV_PATH: Path = BASE_DIR / "data" / "indonesian_recipes.csv"
 DEFAULT_CHROMA_PATH: Path = BASE_DIR / "chroma"
 
 CHROMA_COLLECTION_NAME: str = "nutrition"

@@ -11,7 +11,13 @@ from typing import Any
 
 import pandas as pd
 
-from config import DEFAULT_CSV_PATH, DEFAULT_DB_PATH, get_logger
+from config import (
+    DEFAULT_CSV_PATH,
+    DEFAULT_DB_PATH,
+    DEFAULT_PACKAGED_CSV_PATH,
+    DEFAULT_RECIPES_CSV_PATH,
+    get_logger,
+)
 
 logger = get_logger(__name__)
 
@@ -29,6 +35,8 @@ NUMERIC_NUTRITION_COLUMNS: tuple[str, ...] = (
     "carbohydrate",
 )
 NUTRITION_TABLE_NAME: str = "nutrition"
+PACKAGED_TABLE_NAME: str = "packaged_nutrition"
+RECIPES_TABLE_NAME: str = "recipes"
 
 
 class DatabaseError(Exception):
@@ -218,11 +226,20 @@ def ensure_sqlite_initialized(
     Returns:
         True if initialization was performed, False if data already existed.
     """
-    if get_nutrition_count(db_path) > 0:
-        return False
-    df, _ = load_and_validate_csv(csv_path)
-    save_nutrition_to_sqlite(df, db_path)
-    return True
+    initialized = False
+    if get_nutrition_count(db_path) == 0:
+        df, _ = load_and_validate_csv(csv_path)
+        save_nutrition_to_sqlite(df, db_path)
+        initialized = True
+
+    # Automatically initialize packaged FMCG foods and authentic recipes if available
+    if Path(DEFAULT_PACKAGED_CSV_PATH).exists() and get_packaged_nutrition_count(db_path) == 0:
+        ensure_packaged_nutrition_initialized(DEFAULT_PACKAGED_CSV_PATH, db_path)
+
+    if Path(DEFAULT_RECIPES_CSV_PATH).exists() and get_recipes_count(db_path) == 0:
+        ensure_recipes_initialized(DEFAULT_RECIPES_CSV_PATH, db_path)
+
+    return initialized
 
 
 def _escape_like_term(term: str) -> str:
@@ -352,6 +369,359 @@ def search_nutrition(
 ) -> list[dict[str, Any]]:
     """Backward-compatible nutrition search alias."""
     return search_nutrition_keyword_ranked(query=query, db_path=db_path, limit=limit)
+
+
+# ============================================================================
+# PACKAGED NUTRITION (FMCG / OPEN FOOD FACTS & BPOM) OPERATIONS
+# ============================================================================
+
+def get_packaged_nutrition_count(db_path: str | Path = DEFAULT_DB_PATH) -> int:
+    """Return total rows stored in the packaged_nutrition table, or 0 if unavailable."""
+    path = Path(db_path)
+    if not path.exists():
+        return 0
+    try:
+        with get_db_connection(path) as conn:
+            cursor = conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+                (PACKAGED_TABLE_NAME,),
+            )
+            if cursor.fetchone() is None:
+                return 0
+            count_row = conn.execute(f"SELECT COUNT(*) FROM {PACKAGED_TABLE_NAME}").fetchone()
+            return int(count_row[0]) if count_row else 0
+    except sqlite3.Error as exc:
+        logger.warning("Could not read packaged nutrition count from SQLite: %s", exc)
+        return 0
+
+
+def save_packaged_nutrition_to_sqlite(
+    df: pd.DataFrame,
+    db_path: str | Path = DEFAULT_DB_PATH,
+) -> int:
+    """Persist packaged products DataFrame into SQLite and build search indices.
+
+    Args:
+        df: DataFrame containing packaged food products.
+        db_path: Target SQLite database file path.
+
+    Returns:
+        Number of rows persisted.
+    """
+    try:
+        with get_db_connection(db_path) as conn:
+            df.to_sql(PACKAGED_TABLE_NAME, conn, if_exists="replace", index=False)
+            conn.execute(
+                f"CREATE INDEX IF NOT EXISTS idx_packaged_name "
+                f"ON {PACKAGED_TABLE_NAME}(name COLLATE NOCASE)"
+            )
+            conn.execute(
+                f"CREATE INDEX IF NOT EXISTS idx_packaged_brand "
+                f"ON {PACKAGED_TABLE_NAME}(brand COLLATE NOCASE)"
+            )
+            conn.execute(
+                f"CREATE INDEX IF NOT EXISTS idx_packaged_category "
+                f"ON {PACKAGED_TABLE_NAME}(category COLLATE NOCASE)"
+            )
+    except sqlite3.Error as exc:
+        logger.exception("Failed saving packaged products to SQLite at %s", db_path)
+        raise DatabaseError("Gagal menyimpan data produk kemasan ke SQLite.") from exc
+
+    row_count = len(df)
+    logger.info("Stored %d packaged products into SQLite at %s.", row_count, db_path)
+    return row_count
+
+
+def ensure_packaged_nutrition_initialized(
+    csv_path: str | Path = DEFAULT_PACKAGED_CSV_PATH,
+    db_path: str | Path = DEFAULT_DB_PATH,
+) -> bool:
+    """Initialize packaged_nutrition table if empty or missing.
+
+    Returns:
+        True if initialization took place, False if already populated.
+    """
+    if get_packaged_nutrition_count(db_path) > 0:
+        return False
+    path = Path(csv_path)
+    if not path.exists():
+        logger.warning("Packaged nutrition CSV file not found at %s.", path)
+        return False
+
+    try:
+        df = pd.read_csv(path)
+        save_packaged_nutrition_to_sqlite(df, db_path)
+        return True
+    except Exception:
+        logger.exception("Failed initializing packaged nutrition dataset from %s", path)
+        return False
+
+
+def get_packaged_categories(db_path: str | Path = DEFAULT_DB_PATH) -> list[str]:
+    """Retrieve distinct product categories available in packaged_nutrition table."""
+    if get_packaged_nutrition_count(db_path) == 0:
+        return []
+    try:
+        with get_db_connection(db_path) as conn:
+            rows = conn.execute(
+                f"SELECT DISTINCT category FROM {PACKAGED_TABLE_NAME} WHERE category != '' ORDER BY category ASC"
+            ).fetchall()
+            return [str(r[0]) for r in rows]
+    except sqlite3.Error as exc:
+        logger.warning("Failed retrieving packaged categories: %s", exc)
+        return []
+
+
+def search_packaged_foods(
+    query: str = "",
+    category: str = "",
+    nutri_score: str = "",
+    limit: int = 15,
+    db_path: str | Path = DEFAULT_DB_PATH,
+) -> list[dict[str, Any]]:
+    """Search packaged consumer foods by keyword, category, and Nutri-Score.
+
+    Args:
+        query: Free-text search keyword (matches name or brand).
+        category: Optional category filter.
+        nutri_score: Optional Nutri-Score grade filter (A, B, C, D, E).
+        limit: Maximum results to return.
+        db_path: Path to SQLite database file.
+
+    Returns:
+        List of matching packaged food dictionaries.
+    """
+    if limit <= 0 or get_packaged_nutrition_count(db_path) == 0:
+        return []
+
+    conditions: list[str] = []
+    params: list[Any] = []
+
+    cleaned = query.strip()
+    if cleaned:
+        escaped = f"%{_escape_like_term(cleaned)}%"
+        conditions.append(
+            "(name LIKE ? ESCAPE '\\' COLLATE NOCASE OR brand LIKE ? ESCAPE '\\' COLLATE NOCASE)"
+        )
+        params.extend([escaped, escaped])
+
+    if category.strip():
+        conditions.append("category = ? COLLATE NOCASE")
+        params.append(category.strip())
+
+    if nutri_score.strip():
+        conditions.append("nutri_score = ? COLLATE NOCASE")
+        params.append(nutri_score.strip().upper())
+
+    where_clause = f"WHERE {' AND '.join(conditions)}" if conditions else ""
+    sql = f"""
+        SELECT id, name, brand, category, serving_size_g, serving_unit,
+               calories, proteins, fat, carbohydrate, saturated_fat,
+               sugars, sodium_mg, nutri_score, description
+        FROM {PACKAGED_TABLE_NAME}
+        {where_clause}
+        ORDER BY name ASC
+        LIMIT ?
+    """
+    params.append(limit)
+
+    try:
+        with get_db_connection(db_path) as conn:
+            rows = conn.execute(sql, params).fetchall()
+            return [dict(r) for r in rows]
+    except sqlite3.Error as exc:
+        logger.exception("Failed querying packaged foods with query='%s'", query)
+        raise DatabaseError("Gagal mencari data produk kemasan.") from exc
+
+
+# ============================================================================
+# AUTHENTIC INDONESIAN RECIPES OPERATIONS
+# ============================================================================
+
+def get_recipes_count(db_path: str | Path = DEFAULT_DB_PATH) -> int:
+    """Return total rows stored in the recipes table, or 0 if unavailable."""
+    path = Path(db_path)
+    if not path.exists():
+        return 0
+    try:
+        with get_db_connection(path) as conn:
+            cursor = conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+                (RECIPES_TABLE_NAME,),
+            )
+            if cursor.fetchone() is None:
+                return 0
+            count_row = conn.execute(f"SELECT COUNT(*) FROM {RECIPES_TABLE_NAME}").fetchone()
+            return int(count_row[0]) if count_row else 0
+    except sqlite3.Error as exc:
+        logger.warning("Could not read recipes count from SQLite: %s", exc)
+        return 0
+
+
+def save_recipes_to_sqlite(
+    df: pd.DataFrame,
+    db_path: str | Path = DEFAULT_DB_PATH,
+) -> int:
+    """Persist authentic recipes DataFrame into SQLite and build search indices.
+
+    Args:
+        df: DataFrame containing Indonesian recipes.
+        db_path: Target SQLite database file path.
+
+    Returns:
+        Number of rows persisted.
+    """
+    try:
+        with get_db_connection(db_path) as conn:
+            df.to_sql(RECIPES_TABLE_NAME, conn, if_exists="replace", index=False)
+            conn.execute(
+                f"CREATE INDEX IF NOT EXISTS idx_recipes_name "
+                f"ON {RECIPES_TABLE_NAME}(name COLLATE NOCASE)"
+            )
+            conn.execute(
+                f"CREATE INDEX IF NOT EXISTS idx_recipes_category "
+                f"ON {RECIPES_TABLE_NAME}(category COLLATE NOCASE)"
+            )
+            conn.execute(
+                f"CREATE INDEX IF NOT EXISTS idx_recipes_origin "
+                f"ON {RECIPES_TABLE_NAME}(origin_region COLLATE NOCASE)"
+            )
+    except sqlite3.Error as exc:
+        logger.exception("Failed saving recipes to SQLite at %s", db_path)
+        raise DatabaseError("Gagal menyimpan data resep ke SQLite.") from exc
+
+    row_count = len(df)
+    logger.info("Stored %d authentic recipes into SQLite at %s.", row_count, db_path)
+    return row_count
+
+
+def ensure_recipes_initialized(
+    csv_path: str | Path = DEFAULT_RECIPES_CSV_PATH,
+    db_path: str | Path = DEFAULT_DB_PATH,
+) -> bool:
+    """Initialize recipes table if empty or missing.
+
+    Returns:
+        True if initialization took place, False if already populated.
+    """
+    if get_recipes_count(db_path) > 0:
+        return False
+    path = Path(csv_path)
+    if not path.exists():
+        logger.warning("Recipes CSV file not found at %s.", path)
+        return False
+
+    try:
+        df = pd.read_csv(path)
+        save_recipes_to_sqlite(df, db_path)
+        return True
+    except Exception:
+        logger.exception("Failed initializing recipes dataset from %s", path)
+        return False
+
+
+def get_recipe_categories(db_path: str | Path = DEFAULT_DB_PATH) -> list[str]:
+    """Retrieve distinct recipe categories available in the recipes table."""
+    if get_recipes_count(db_path) == 0:
+        return []
+    try:
+        with get_db_connection(db_path) as conn:
+            rows = conn.execute(
+                f"SELECT DISTINCT category FROM {RECIPES_TABLE_NAME} WHERE category != '' ORDER BY category ASC"
+            ).fetchall()
+            return [str(r[0]) for r in rows]
+    except sqlite3.Error as exc:
+        logger.warning("Failed retrieving recipe categories: %s", exc)
+        return []
+
+
+def search_recipes(
+    query: str = "",
+    category: str = "",
+    health_tag: str = "",
+    limit: int = 10,
+    db_path: str | Path = DEFAULT_DB_PATH,
+) -> list[dict[str, Any]]:
+    """Search authentic Indonesian recipes with optional category and health tag filters.
+
+    Args:
+        query: Free-text search keyword (matches name or ingredients).
+        category: Recipe category filter (e.g. 'Sup & Soto', 'Kukus & Pepes').
+        health_tag: Health condition or nutritional filter (e.g. 'Tinggi Protein', 'Rendah Lemak').
+        limit: Maximum results to return.
+        db_path: SQLite database file path.
+
+    Returns:
+        List of matching recipe dictionaries.
+    """
+    if limit <= 0 or get_recipes_count(db_path) == 0:
+        return []
+
+    conditions: list[str] = []
+    params: list[Any] = []
+
+    cleaned = query.strip()
+    if cleaned:
+        escaped = f"%{_escape_like_term(cleaned)}%"
+        conditions.append(
+            "(name LIKE ? ESCAPE '\\' COLLATE NOCASE OR ingredients_json LIKE ? ESCAPE '\\' COLLATE NOCASE)"
+        )
+        params.extend([escaped, escaped])
+
+    if category.strip():
+        conditions.append("category = ? COLLATE NOCASE")
+        params.append(category.strip())
+
+    if health_tag.strip():
+        escaped_tag = f"%{_escape_like_term(health_tag.strip())}%"
+        conditions.append("health_tags LIKE ? ESCAPE '\\' COLLATE NOCASE")
+        params.append(escaped_tag)
+
+    where_clause = f"WHERE {' AND '.join(conditions)}" if conditions else ""
+    sql = f"""
+        SELECT id, name, origin_region, category, prep_time_minutes,
+               servings, ingredients_json, instructions_text,
+               calories_per_serving, protein_g, fat_g, carb_g, health_tags
+        FROM {RECIPES_TABLE_NAME}
+        {where_clause}
+        ORDER BY prep_time_minutes ASC, name ASC
+        LIMIT ?
+    """
+    params.append(limit)
+
+    try:
+        with get_db_connection(db_path) as conn:
+            rows = conn.execute(sql, params).fetchall()
+            return [dict(r) for r in rows]
+    except sqlite3.Error as exc:
+        logger.exception("Failed querying recipes with query='%s'", query)
+        raise DatabaseError("Gagal mencari resep masakan.") from exc
+
+
+def get_recipe_by_id(
+    recipe_id: int,
+    db_path: str | Path = DEFAULT_DB_PATH,
+) -> dict[str, Any] | None:
+    """Retrieve an authentic recipe by its primary ID."""
+    if get_recipes_count(db_path) == 0:
+        return None
+    try:
+        with get_db_connection(db_path) as conn:
+            row = conn.execute(
+                f"""
+                SELECT id, name, origin_region, category, prep_time_minutes,
+                       servings, ingredients_json, instructions_text,
+                       calories_per_serving, protein_g, fat_g, carb_g, health_tags
+                FROM {RECIPES_TABLE_NAME}
+                WHERE id = ?
+                """,
+                (recipe_id,),
+            ).fetchone()
+            return dict(row) if row else None
+    except sqlite3.Error as exc:
+        logger.warning("Failed retrieving recipe ID %d: %s", recipe_id, exc)
+        return None
+
 
 
 

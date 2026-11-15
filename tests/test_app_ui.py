@@ -116,14 +116,19 @@ def test_app_all_menus_happy_path_and_indexing(
         at.button(key="compare_button").click().run()
         assert not at.exception
 
-        # 5. Index Data
+        # 5. Produk Kemasan & Nutri-Score
+        at.sidebar.radio[0].set_value("Produk Kemasan & Nutri-Score").run()
+        assert not at.exception
+        assert any("Produk Kemasan & Nutri-Score" in str(h.value) for h in at.header)
+
+        # 6. Index Data
         at.sidebar.radio[0].set_value("Index Data").run()
         at.button(key="reindex_button").click().run()
         assert not at.exception
         assert len(at.success) == 1
         assert "3 item ke ChromaDB" in at.success[0].value
 
-        # 6. Tanya Gizi after indexing now succeeds via RAG
+        # 7. Tanya Gizi after indexing now succeeds via RAG
         at.sidebar.radio[0].set_value("Tanya Gizi").run()
         at.text_input(key="rag_query_input").input("Berapa kalori nasi goreng?").run()
         at.button(key="rag_query_button").click().run()
