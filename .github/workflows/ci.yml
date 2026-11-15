@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-lint:
+    name: Lint & Automated Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv package manager
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Install project dependencies
+        run: uv sync
+
+      - name: Run Ruff Lint Check
+        run: uv run ruff check .
+
+      - name: Run Test Suite
+        run: uv run pytest -v
+        env:
+          API_KEY: "test-ci-key-1234567890"
+          BASE_URL: "https://ai.sumopod.com/v1"
+          MODEL_LLM: "glm-5.3-flash"
+          MODEL_EMBEDDING: "text-embedding-3-small"
