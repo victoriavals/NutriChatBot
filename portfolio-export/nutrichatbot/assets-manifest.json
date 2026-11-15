@@ -1,0 +1,154 @@
+{
+  "assets": [
+    {
+      "filename": "01-tanya-gizi-chat.webp",
+      "preview": "01-tanya-gizi-chat-preview.webp",
+      "title": {
+        "en": "Tanya Gizi Conversational RAG Interface",
+        "id": "Antarmuka Percakapan Tanya Gizi Berbasis RAG"
+      },
+      "alt": {
+        "en": "Desktop view of NutriChatBot Tanya Gizi conversation displaying factual macro values and ChromaDB plus SQLite citations.",
+        "id": "Tampilan desktop NutriChatBot Tanya Gizi memperlihatkan percakapan nilai makronutrisi faktual dan rujukan ChromaDB serta SQLite."
+      },
+      "caption": {
+        "en": "Real-time streaming nutrition Q&A tab displaying grounded Indonesian food data, medical disclaimer, and retrieval references.",
+        "id": "Tab tanya-jawab gizi streaming real-time yang menampilkan data pangan Indonesia terverifikasi, disclaimer medis, dan referensi retrieval."
+      },
+      "width": 1600,
+      "height": 1000,
+      "bytes": 25280,
+      "sha256": "a88dd2e344a17981748f5e076233dba7ab7ee02755d96b4f73dd2db789bc83d5",
+      "previewWidth": 600,
+      "previewHeight": 375,
+      "previewBytes": 4682,
+      "previewSha256": "b3961929be5dab668c3cccfc0ac10d19e44fb1e7838ea35c9bbf0feab3bb7bb8",
+      "isCover": true
+    },
+    {
+      "filename": "02-kalkulator-bmr-tdee-dan-menu.webp",
+      "preview": "02-kalkulator-bmr-tdee-dan-menu-preview.webp",
+      "title": {
+        "en": "Mifflin-St Jeor BMR/TDEE Calculator & Weekly Planner",
+        "id": "Kalkulator BMR/TDEE Mifflin-St Jeor & Perencana Menu"
+      },
+      "alt": {
+        "en": "Weekly meal planner interface featuring personalized BMR and TDEE calculations and macronutrient target distribution.",
+        "id": "Antarmuka perencana menu mingguan yang menampilkan perhitungan personal BMR dan TDEE serta distribusi target makronutrisi."
+      },
+      "caption": {
+        "en": "Clinically validated metabolic calculator deriving daily calorie goals and automated 7-day nutritional meal plans.",
+        "id": "Kalkulator metabolik tervalidasi klinis untuk menentukan target kalori harian dan perencanaan menu gizi 7 hari otomatis."
+      },
+      "width": 1600,
+      "height": 1000,
+      "bytes": 88738,
+      "sha256": "f69329e62f7fe40af7d8490ff3c7eb354e60feaa4c6fc9ebfbbccdab46dcbdb7",
+      "previewWidth": 600,
+      "previewHeight": 375,
+      "previewBytes": 15308,
+      "previewSha256": "3c91c9dc99ac0214a685e4269d3392094260dfb145fd3324bda8fe6326bd7601",
+      "isCover": false
+    },
+    {
+      "filename": "03-perbandingan-gizi-visual.webp",
+      "preview": "03-perbandingan-gizi-visual-preview.webp",
+      "title": {
+        "en": "Interactive Visual Food Nutrient Comparison",
+        "id": "Perbandingan Visual Kandungan Gizi Bahan Pangan"
+      },
+      "alt": {
+        "en": "Side-by-side nutritional comparison between two Indonesian foods with macro metrics and Altair bar chart.",
+        "id": "Perbandingan nutrisi berdampingan antara dua pangan Indonesia dilengkapi metrik makro dan grafik batang Altair."
+      },
+      "caption": {
+        "en": "Side-by-side macronutrient analytics comparing caloric density, proteins, fats, and carbohydrates across 1,346 items.",
+        "id": "Analisis makronutrisi berdampingan yang membandingkan densitas kalori, protein, lemak, dan karbohidrat dari 1.346 item."
+      },
+      "width": 1600,
+      "height": 1000,
+      "bytes": 81816,
+      "sha256": "722a919f70ce22caf160c3035de8d8f8d8b8bfe2443add75abe1f5176c910f0c",
+      "previewWidth": 600,
+      "previewHeight": 375,
+      "previewBytes": 14554,
+      "previewSha256": "2c1bb71a7e033adadae756a39794285a12eefe63e53b0255d5e77a37521e45bd",
+      "isCover": false
+    },
+    {
+      "filename": "04-generator-resep-sehat.webp",
+      "preview": "04-generator-resep-sehat-preview.webp",
+      "title": {
+        "en": "Healthy Recipe Generator with Dietary Filters",
+        "id": "Generator Resep Sehat dengan Filter Pola Makan"
+      },
+      "alt": {
+        "en": "Healthy recipe creation tool with ingredient inputs, disease-specific diet filters, and markdown export button.",
+        "id": "Alat peracik resep sehat dengan input bahan, filter diet penyakit tertentu, dan tombol unduh format markdown."
+      },
+      "caption": {
+        "en": "AI-powered recipe formulation taking pantry ingredients and clinical dietary constraints (e.g., low-salt, low-sugar) to create tailored dishes.",
+        "id": "Peracikan resep berbasis AI yang memadukan bahan dapur dan batasan diet klinis (rendah garam, rendah gula) menjadi masakan bergizi seimbang."
+      },
+      "width": 1600,
+      "height": 1000,
+      "bytes": 94906,
+      "sha256": "40a9f6cd62a8886026f2ffc5bd2e5069504275c51de32f4ed6c7a6c3080403bc",
+      "previewWidth": 600,
+      "previewHeight": 375,
+      "previewBytes": 15716,
+      "previewSha256": "6c8817064af5aa129df46eba51312f9b1e2fabc209fac99aa7e42746def22e27",
+      "isCover": false
+    },
+    {
+      "filename": "05-tampilan-mobile-chat.webp",
+      "preview": "05-tampilan-mobile-chat-preview.webp",
+      "title": {
+        "en": "Mobile Responsive Conversational View",
+        "id": "Tampilan Responsif Seluler Antarmuka Percakapan"
+      },
+      "alt": {
+        "en": "Mobile viewport rendering of NutriChatBot showcasing a clean, responsive conversational layout on 390x844 resolution.",
+        "id": "Render resolusi seluler NutriChatBot yang menampilkan tata letak percakapan responsif dan ringkas pada resolusi 390x844."
+      },
+      "caption": {
+        "en": "Fully responsive mobile layout optimized for handheld dietary logging and on-the-go nutritional inquiry.",
+        "id": "Tata letak seluler responsif penuh yang dioptimalkan untuk pencatatan diet cepat dan konsultasi nutrisi langsung dari ponsel."
+      },
+      "width": 390,
+      "height": 844,
+      "bytes": 18850,
+      "sha256": "d875571d1b8dbc3a3371fef5dd19f3cc763725afb1fc399914cbee431c5967d6",
+      "previewWidth": 390,
+      "previewHeight": 844,
+      "previewBytes": 14616,
+      "previewSha256": "f1674fdc9f6a897cfad188d53a8c56bf0ecf96415b93f85ed34441747e6076c8",
+      "isCover": false
+    },
+    {
+      "filename": "06-arsitektur-hybrid-rag.webp",
+      "preview": "06-arsitektur-hybrid-rag-preview.webp",
+      "title": {
+        "en": "High-Performance Dual-Engine Hybrid RAG Architecture",
+        "id": "Arsitektur Hybrid RAG Dual-Engine Berperforma Tinggi"
+      },
+      "alt": {
+        "en": "System architecture diagram illustrating the end-to-end pipeline from Streamlit UI, guardrails, SQLite and ChromaDB, wRRF fusion, to GLM LLM inference.",
+        "id": "Diagram arsitektur sistem yang mengilustrasikan alur menyeluruh mulai dari Streamlit UI, guardrail, SQLite dan ChromaDB, fusi wRRF, hingga inferensi GLM LLM."
+      },
+      "caption": {
+        "en": "Technical architectural diagram detailing the Weighted Reciprocal Rank Fusion retrieval core, safety guardrails, and streaming inference pipeline.",
+        "id": "Diagram arsitektur teknis yang memerinci inti retrieval Weighted Reciprocal Rank Fusion, guardrail keselamatan medis, dan alur inferensi streaming."
+      },
+      "width": 1600,
+      "height": 1000,
+      "bytes": 171876,
+      "sha256": "3ce72de47651a7771a21bbb5234c8e7d209e6c688ca2efc4885a9f997fb908da",
+      "previewWidth": 600,
+      "previewHeight": 375,
+      "previewBytes": 32498,
+      "previewSha256": "da7a59527ed51a3097b304b84362c746a62d580e41c5dfb95a543d53cdc6c6c6",
+      "isCover": false
+    }
+  ]
+}
