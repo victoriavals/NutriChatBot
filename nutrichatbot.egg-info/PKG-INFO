@@ -10,6 +10,7 @@ Requires-Dist: google-generativeai<1.0.0,>=0.8.5
 Requires-Dist: python-dotenv<2.0.0,>=1.0.0
 Requires-Dist: chromadb<2.0.0,>=1.0.0
 Requires-Dist: pysqlite3-binary>=0.5.4; sys_platform == "linux"
+Requires-Dist: openai>=3.51.0
 Provides-Extra: dev
 Requires-Dist: pytest>=8.0.0; extra == "dev"
 Requires-Dist: ruff>=0.4.0; extra == "dev"
