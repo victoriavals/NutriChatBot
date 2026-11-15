@@ -13,6 +13,7 @@
     "id": "Asisten nutrisi teruji yang memadukan pencarian semantik ChromaDB dan leksikal SQLite melalui Weighted Reciprocal Rank Fusion, menghadirkan saran gizi berbasis data resmi pangan, UI/UX ramah pengguna awam, dan kalkulator Mifflin-St Jeor dengan penalaran GLM-5.3-flash."
   },
   "coverAsset": "01-tanya-gizi-chat.webp",
+  "logoAsset": "logo.webp",
   "stack": [
     "Python 3.12",
     "Streamlit",
@@ -27,8 +28,8 @@
     "id": "LLM umum kerap mengalami halusinasi pada data takaran nutrisi dan minim memahami komposisi bahan pangan lokal Indonesia (DKBM), sementara masyarakat awam kerap bingung saat berhadapan dengan chat kosong (blank-canvas), kesulitan memahami rumus kalori (BMR/TDEE), serta rentan terhadap anjuran diet tanpa batasan keselamatan medis."
   },
   "personalContribution": {
-    "en": "Designed and engineered the end-to-end architecture: implemented the Dual-Engine Hybrid RAG with Weighted Reciprocal Rank Fusion (wRRF), integrated the Mifflin-St Jeor metabolic formula, implemented medical risk detection guardrails and log redaction filters, designed user-centered UI/UX interactions for non-technical users (interactive prompt chips, quick comparative takeaways, BMI visual badges, and separated developer observability), refactored the multi-turn Streamlit conversational UI, and established 100% passing automated test coverage with GitHub Actions CI.",
-    "id": "Merancang dan membangun arsitektur menyeluruh: mengimplementasikan Hybrid RAG Dual-Engine dengan Weighted Reciprocal Rank Fusion (wRRF), mengintegrasikan kalkulator metabolik formula Mifflin-St Jeor, membangun guardrail deteksi risiko medis dan filter redaksi log sensitif, merekayasa antarmuka UI/UX ramah pengguna awam (chip pertanyaan cepat, ringkasan perbandingan gizi instan, lencana status BMI, pemisahan telemetri teknis), serta mendirikan cakupan pengujian otomatis berstatus 100% lulus pada GitHub Actions CI."
+    "en": "Designed and engineered the end-to-end architecture: implemented the Dual-Engine Hybrid RAG with Weighted Reciprocal Rank Fusion (wRRF), integrated the Mifflin-St Jeor metabolic formula, built medical risk detection guardrails and log redaction filters, designed user-centered UI/UX interactions for non-technical users (interactive prompt chips, quick comparative takeaways, BMI visual badges, and separated developer observability), crafted the official brand identity logo mark ('Smart Nutri-Leaf') integrated across app header, sidebar, and favicon, and established 100% passing automated test coverage with GitHub Actions CI.",
+    "id": "Merancang dan membangun arsitektur menyeluruh: mengimplementasikan Hybrid RAG Dual-Engine dengan Weighted Reciprocal Rank Fusion (wRRF), mengintegrasikan kalkulator metabolik formula Mifflin-St Jeor, membangun guardrail deteksi risiko medis dan filter redaksi log sensitif, merekayasa antarmuka UI/UX ramah pengguna awam (chip pertanyaan cepat, ringkasan perbandingan gizi instan, lencana status BMI, pemisahan telemetri teknis), merancang identitas merek dan logo vektor resmi ('Smart Nutri-Leaf') yang terintegrasi pada header aplikasi, sidebar, dan favicon, serta mendirikan cakupan pengujian otomatis berstatus 100% lulus pada GitHub Actions CI."
   },
   "engineeringFocus": {
     "en": "Dual-engine hybrid retrieval with Weighted Reciprocal Rank Fusion (wRRF) fusing vector cosine distance and lexical rank scoring; real-time streaming token generation; household serving size (URT) translation layer; authentic regional recipe library; FMCG retail database with Nutri-Score; strict regex credential redaction; comprehensive 68-test verification pyramid.",
@@ -62,6 +63,10 @@
     {
       "decision": "Dual Database Storage (SQLite + ChromaDB)",
       "rationale": "SQLite provides ACID compliance, fast exact-match lookups, and aggregate analytical capability, while ChromaDB provides localized persistent high-dimensional vector search without expensive cloud managed vector database overhead."
+    },
+    {
+      "decision": "Visual Brand Identity & Vector Logo Mark ('Smart Nutri-Leaf')",
+      "rationale": "Elevates consumer trust, visual recognition, and aesthetic warmth for non-technical users by integrating a cohesive vector logo across headers, sidebar badges, and browser favicons, replacing generic text emojis."
     }
   ],
   "proof": {

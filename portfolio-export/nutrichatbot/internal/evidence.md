@@ -27,6 +27,7 @@
 | **Household Servings (URT)** | `services/serving_size.py`: Lines 1–180 (`calculate_nutrition_for_serving`) | `tests/test_serving_size.py` (8 tests PASS) |
 | **Packaged Foods & Nutri-Score** | `services/database.py`: Lines 380–490 (`search_packaged_foods`, 60 products) | `tests/test_packaged_nutrition.py` (4 tests PASS) |
 | **Authentic Regional Recipes** | `services/recipe_service.py` & `services/database.py` (30 authentic recipes) | `tests/test_recipe_service.py` (5 tests PASS) |
+| **Brand Logo & Favicon** | `assets/logo.png` & `app.py`: Lines 964–985, 1040–1048 | `tests/test_app_ui.py` (3 UI tests PASS) & Visual Verification |
 | **Database Anomaly Checks** | `services/database.py`: Lines 110–145 (`detect_nutrition_anomalies`) | `tests/test_database.py::test_detect_nutrition_anomalies_flags_implausible_macros` (PASS) |
 
 ---

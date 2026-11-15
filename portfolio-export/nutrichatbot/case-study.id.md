@@ -50,6 +50,7 @@ Sebagai perancang dan pengembang utama (author), Naufal Firdaus memimpin dan men
 - **Mesin Perhitungan Metabolik:** Membangun modul `services/nutrition_calc.py` yang mengimplementasikan rumus Basal Metabolic Rate (BMR) dan Total Daily Energy Expenditure (TDEE) Mifflin-St Jeor, lengkap dengan validasi batas fisik dan pembagian rasio kalori makronutrisi.
 - **Rekayasa UI/UX Berpusat pada Pengguna Awam:** Membangun sistem desain ramah konsumen pada `app.py`:
   - Menyuntikkan CSS kustom untuk tata letak modern, kartu metrik lembut, dan tombol *pill-chips* ergonomis.
+  - Merancang identitas merek dan logo vektor resmi ("Smart Nutri-Leaf") serta mengintegrasikannya ke header aplikasi, sidebar, dan favicon browser guna memperkuat kenyamanan dan kepercayaan pengguna awam.
   - Membangun mekanisme *interactive prompt chips* di seluruh menu untuk menghapus kebingungan pengguna saat pertama kali membuka aplikasi.
   - Memisahkan telemetri diagnostik pengembang ke dalam expander terpisah, mengutamakan status asisten yang hangat dan menenangkan bagi pengguna biasa.
   - Mengimplementasikan logika pembanding otomatis untuk memberikan kesimpulan gizi verbal seketika tanpa menuntut pengguna berhitung manual.
@@ -72,6 +73,7 @@ Untuk memecahkan kelemahan retrieval satu paradigma, NutriChatBot menerapkan pip
 
 ### B. Rekayasa UX untuk Pengguna Awam (Human-Computer Interaction)
 Menerapkan teknik interaksi khusus untuk memudahkan pemula:
+- **Identitas Visual yang Ramah & Menenangkan:** Mengintegrasikan logo vektor resmi ("Smart Nutri-Leaf") pada header dan sidebar, menggantikan ikon teks generik guna membangun kredibilitas dan kehangatan bagi pengguna awam.
 - **State-Hydrated Prompt Chips:** Mengintegrasikan tombol pintasan pertanyaan populer yang secara otomatis mengisi state input tanpa mengetik manual.
 - **Kesimpulan Visual Otomatis (Takeaway Cards):** Menghitung selisih nilai makro ($|Kal_1 - Kal_2|$, $|Prot_1 - Prot_2|$) dan menyajikannya dalam kartu sorotan sederhana (opsi mana yang lebih rendah kalori dan mana yang lebih kaya protein).
 - **Edukasi Kalori Bersahabat:** Menyajikan panduan konsep "Isi Piringku" (25% Protein, 25% Lemak Sehat, 50% Karbohidrat Kompleks) yang didampingi lencana warna status BMI (`🟢 Ideal` vs `🟡 Perlu Perhatian`).
@@ -103,6 +105,7 @@ Arsitektur sistem NutriChatBot terbagi ke dalam 5 lapisan hierarkis:
 +-----------------------------------------------------------------------------------+
 |                            1. LAPISAN PRESENTASI (UI/UX)                          |
 |         Aplikasi Web Streamlit Multi-Tab (Desktop 1600x1000 & Seluler 390x844)    |
+|  - Logo Resmi "Smart Nutri-Leaf" & Favicon Browser Terintegrasi                   |
 |  - Token Desain CSS Kustom & Kartu Metrik Lembut                                  |
 |  - Chip Pintasan Pertanyaan & Resep Sekali Klik (Bebas Hambatan Mengetik)         |
 |  - Pemisahan Drawer Telemetri Pengembang dari Antarmuka Konsumen Biasa            |
@@ -165,6 +168,7 @@ Arsitektur sistem NutriChatBot terbagi ke dalam 5 lapisan hierarkis:
 - `services/nutrition_calc.py`: Modul matematika murni untuk menghitung BMR/TDEE Mifflin-St Jeor, faktor pengali aktivitas fisik, status BMI, dan distribusi makronutrisi.
 - `services/llm.py`: Peracikan prompt terstruktur, pencegatan risiko klinis, dan generator streaming token untuk fitur tanya-jawab, resep sehat, rencana menu, dan alternatif bahan.
 - `app.py`: Titik masuk aplikasi Streamlit yang mengelola styling CSS kustom (`_inject_custom_styles`), hidrasi session state untuk *chips*, diagram Altair, direktori Nutri-Score FMCG, dan navigasi 7 menu yang ramah pengguna awam.
+- `assets/logo.png` & `assets/logo.webp`: Aset visual resmi identitas merek ("Smart Nutri-Leaf") resolusi tinggi 1024x1024 px dan format WebP teroptimasi untuk favicon browser, header, dan sidebar.
 
 ### Formula Matematika Utama
 
@@ -199,6 +203,7 @@ $$\text{TDEE} = \text{BMR} \times \text{Faktor Aktivitas}$$
 | **Pustaka Resep Nusantara Otentik** | 100% Generasi AI Generik | Generasi AI tanpa rujukan sering mengarang takaran bumbu masakan tradisional. Menautkan pencarian kulkas ke 30 resep nusantara otentik menjamin keaslian cita rasa daerah dan akurasi kalori per porsi saji. |
 | **Streamlit Community Cloud Deployment** | Self-hosted VPS / AWS EC2 | Menyediakan hosting publik nir-biaya yang terhubung langsung dengan branch main GitHub, dilengkapi fitur Continuous Deployment dan manajemen secrets yang aman untuk API key tanpa kerumitan administrasi server. |
 | **Pengujian Streamlit (`AppTest`)** | Headless Selenium / Playwright | Streamlit `AppTest` memungkinkan simulasi siklus hidup UI secara headless dalam hitungan milidetik di dalam `pytest` tanpa perlu menjalankan peramban berat. |
+| **Identitas Merek Vektor ("Smart Nutri-Leaf")** | Ikon Emoji Teks Mentah (🍎🥕) | Emoji sistem operasi kerap dirender tidak seragam antar peramban dan menimbulkan kesan proyek prototipe amatir. Menghadirkan logo vektor khusus yang terpasang konsisten di header, sidebar, dan favicon membangun rasa percaya (*consumer trust*) pengguna awam terhadap kualitas dan keandalan data nutrisi. |
 
 ---
 

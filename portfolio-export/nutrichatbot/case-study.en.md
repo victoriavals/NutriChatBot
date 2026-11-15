@@ -50,6 +50,7 @@ As the primary author and engineer, Naufal Firdaus conceptualized, implemented, 
 - **Metabolic Calculation Engine:** Developed `services/nutrition_calc.py`, implementing the Mifflin-St Jeor Basal Metabolic Rate (BMR) and Total Daily Energy Expenditure (TDEE) formula, complete with rigorous physical bounds validation and macronutrient calorie-ratio distribution.
 - **User-Centered Interface & Ergonomics:** Engineered an accessible design system in `app.py`:
   - Injected custom CSS for streamlined container spacing, responsive metric cards, and tactile pill buttons.
+  - Crafted the official brand identity logo mark ("Smart Nutri-Leaf") seamlessly embedded into app headers, sidebar branding, and browser favicons, establishing trust and warmth.
   - Developed one-click suggestion chips across all tabs to eliminate blank-canvas cognitive friction.
   - Relegated developer diagnostic telemetry into a collapsible expander drawer, prioritizing a clean, welcoming assistant status for everyday consumers.
   - Implemented automated comparative takeaways in food analysis to deliver instant nutritional insights without requiring users to do mental math.
@@ -72,6 +73,7 @@ To overcome the limitations of single-paradigm retrieval, NutriChatBot employs a
 
 ### B. User-Centered Design (UCD) for Non-Technical Users
 Engineered specific HCI mechanisms to cater to laypersons:
+- **Welcoming Visual Brand Identity:** Integrated the official vector logo mark ("Smart Nutri-Leaf") across headers, sidebar badges, and browser favicons, replacing raw text emojis to build consumer trust and aesthetic warmth.
 - **State-Hydrated Prompt Chips:** Integrated one-click suggestion pills that hydrate Streamlit's `st.session_state` before widget instantiation, enabling users to explore common questions (*Kalori Dada Ayam*, *Gizi Nasi Goreng*, *Lemak Sehat Alpukat*) without typing.
 - **Visual Nutritional Takeaways:** Programmatically computes macro differentials ($|Cal_1 - Cal_2|$, $|Prot_1 - Prot_2|$) and renders colored callout cards highlighting the "Lower Calorie" and "Higher Protein" options.
 - **Demystified Calorie Education:** Translates clinical Mifflin-St Jeor outputs into actionable "Isi Piringku" macro proportions (25% Protein, 25% Healthy Fats, 50% Complex Carbohydrates) paired with color-coded BMI badges (`Ideal 🟢` vs. `Perlu Perhatian 🟡`).
@@ -103,6 +105,7 @@ The NutriChatBot system follows a modular 5-tier architecture:
 +-----------------------------------------------------------------------------------+
 |                            1. PRESENTATION LAYER (UI/UX)                          |
 |         Streamlit Multi-Tab Web Application (Desktop 1600x1000 & Mobile 390x844)  |
+|  - Official "Smart Nutri-Leaf" Vector Brand Mark & Integrated Browser Favicon     |
 |  - Custom CSS Design Tokens & Rounded Metric Cards                                |
 |  - One-Click Prompt & Recipe Suggestion Chips (Eliminating Blank Canvas)          |
 |  - Dedicated Developer Telemetry Drawer (Separated from Layperson UI)             |
@@ -168,6 +171,7 @@ The NutriChatBot system follows a modular 5-tier architecture:
 - `services/nutrition_calc.py`: Pure mathematical service computing Mifflin-St Jeor equations, activity factor multipliers, BMI categorization, and macro splits.
 - `services/llm.py`: Prompt synthesis, clinical comorbidity interception, and token streaming generators for Q&A, recipes, weekly plans, and alternatives.
 - `app.py`: Streamlit entrypoint coordinating UI styling (`_inject_custom_styles`), interactive chips state-hydration, Altair charting, FMCG Nutri-Score directory, and layperson-friendly navigation across all 7 views.
+- `assets/logo.png` & `assets/logo.webp`: Official "Smart Nutri-Leaf" high-resolution 1024x1024 px brand mark and optimized WebP assets for browser favicons, header display, and sidebar branding.
 
 ### Core Mathematical Formulae
 
@@ -202,6 +206,7 @@ $$\text{TDEE} = \text{BMR} \times \text{Activity Multiplier}$$
 | **Authentic Regional Recipe Library** | 100% Unanchored LLM Generation | Unanchored LLMs often hallucinate seasonings or portion sizes for traditional regional recipes. Pairing pantry search with 30 authentic regional recipes guarantees cultural authenticity and verified nutritional breakdowns. |
 | **Streamlit Community Cloud Deployment** | Self-hosted VPS / AWS EC2 | Provides zero-cost public hosting with direct continuous deployment from GitHub `main` branch, featuring secure UI-based secrets management without infrastructure maintenance overhead. |
 | **Streamlit Testing (`AppTest`)** | Headless Selenium / Playwright | Streamlit's native `AppTest` enables sub-second headless execution of complete UI state machines inside standard `pytest` without spinning up heavyweight browser processes. |
+| **Vector Brand Identity ("Smart Nutri-Leaf")** | Raw Platform Emojis (🍎🥕) | Standard OS emojis render inconsistently across mobile and desktop browsers, imparting a prototype feel. Embedding an integrated vector logo mark across headers, sidebar badges, and browser favicons cultivates layperson trust and aesthetic cohesion. |
 
 ---
 
