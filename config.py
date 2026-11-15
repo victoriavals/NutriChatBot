@@ -16,7 +16,14 @@ DEFAULT_CSV_PATH: Path = BASE_DIR / "data" / "nutrition.csv"
 DEFAULT_CHROMA_PATH: Path = BASE_DIR / "chroma"
 
 CHROMA_COLLECTION_NAME: str = "nutrition"
-DEFAULT_GEMINI_MODEL: str = "gemini-2.0-flash"
+
+# AI Provider Configuration (SumoPod AI / OpenAI compatible)
+DEFAULT_BASE_URL: str = "https://ai.sumopod.com/v1"
+DEFAULT_LLM_MODEL: str = "glm-5.3-flash"
+DEFAULT_EMBEDDING_MODEL: str = "text-embedding-3-small"
+
+# Legacy alias for backward compatibility
+DEFAULT_GEMINI_MODEL: str = DEFAULT_LLM_MODEL
 
 EMBEDDING_BATCH_SIZE: int = 100
 DEFAULT_RAG_RESULTS: int = 3
@@ -25,19 +32,20 @@ MIN_DAILY_CALORIES: int = 1000
 MAX_DAILY_CALORIES: int = 5000
 DEFAULT_DAILY_CALORIES: int = 2000
 
+# Token budgets (increased for reasoning models like GLM)
 RAG_TEMPERATURE: float = 0.2
-RAG_MAX_TOKENS: int = 512
+RAG_MAX_TOKENS: int = 1536
 
 RECIPE_TEMPERATURE: float = 0.3
-RECIPE_MAX_TOKENS: int = 1024
+RECIPE_MAX_TOKENS: int = 2048
 
 MENU_TEMPERATURE: float = 0.2
-MENU_MAX_TOKENS: int = 2048
+MENU_MAX_TOKENS: int = 3072
 
 ALTERNATIVE_TEMPERATURE: float = 0.5
-ALTERNATIVE_MAX_TOKENS: int = 512
+ALTERNATIVE_MAX_TOKENS: int = 1024
 
-_API_KEY_PATTERN = re.compile(r"AIza[0-9A-Za-z_\-]{20,}")
+_API_KEY_PATTERN = re.compile(r"(AIza[0-9A-Za-z_\-]{10,}|sk-[0-9A-Za-z_\-]{10,})")
 
 
 class ConfigurationError(RuntimeError):
@@ -45,7 +53,7 @@ class ConfigurationError(RuntimeError):
 
 
 class SensitiveDataFilter(logging.Filter):
-    """Redacts Google API key patterns from log records."""
+    """Redacts API key patterns (Google AI Studio and OpenAI/SumoPod) from log records."""
 
     def filter(self, record: logging.LogRecord) -> bool:
         """Sanitize message and arguments before emission."""
@@ -78,11 +86,23 @@ def get_logger(name: str, level: int = logging.INFO) -> logging.Logger:
 class AppSettings:
     """Immutable application settings loaded from environment variables."""
 
-    gemini_api_key: str | None
-    gemini_model: str = DEFAULT_GEMINI_MODEL
+    api_key: str | None
+    base_url: str = DEFAULT_BASE_URL
+    model_llm: str = DEFAULT_LLM_MODEL
+    model_embedding: str = DEFAULT_EMBEDDING_MODEL
     db_path: Path = DEFAULT_DB_PATH
     csv_path: Path = DEFAULT_CSV_PATH
     chroma_path: Path = DEFAULT_CHROMA_PATH
+
+    @property
+    def gemini_api_key(self) -> str | None:
+        """Backward-compatible alias for api_key."""
+        return self.api_key
+
+    @property
+    def gemini_model(self) -> str:
+        """Backward-compatible alias for model_llm."""
+        return self.model_llm
 
 
 def load_settings(
@@ -93,32 +113,53 @@ def load_settings(
 
     Args:
         env_file: Optional path to a `.env` file. Defaults to automatic discovery.
-        require_api_key: When True, raises ConfigurationError if GEMINI_API_KEY is missing.
+        require_api_key: When True, raises ConfigurationError if API_KEY is missing.
 
     Returns:
         Populated AppSettings instance.
 
     Raises:
-        ConfigurationError: If require_api_key is True and GEMINI_API_KEY is missing or blank.
+        ConfigurationError: If require_api_key is True and API_KEY is missing or blank.
     """
     if env_file is not None:
         load_dotenv(dotenv_path=env_file)
     else:
         load_dotenv()
 
-    raw_key = os.getenv("GEMINI_API_KEY")
+    # Prioritize API_KEY as specified by user, with fallback to other common names
+    raw_key = (
+        os.getenv("API_KEY")
+        or os.getenv("SUMOPOD_API_KEY")
+        or os.getenv("OPENAI_API_KEY")
+        or os.getenv("GEMINI_API_KEY")
+    )
     api_key = raw_key.strip() if raw_key and raw_key.strip() else None
 
     if require_api_key and not api_key:
         raise ConfigurationError(
-            "GEMINI_API_KEY tidak ditemukan. Silakan set di file .env atau environment variables."
+            "API_KEY tidak ditemukan. Silakan set di file .env atau environment variables."
         )
 
-    raw_model = os.getenv("GEMINI_MODEL", DEFAULT_GEMINI_MODEL).strip()
-    model_name = raw_model or DEFAULT_GEMINI_MODEL
+    raw_base_url = (
+        os.getenv("BASE_URL")
+        or os.getenv("SUMOPOD_BASE_URL")
+        or DEFAULT_BASE_URL
+    ).strip()
+    base_url = raw_base_url or DEFAULT_BASE_URL
+
+    raw_llm = (
+        os.getenv("MODEL_LLM")
+        or os.getenv("GEMINI_MODEL")
+        or DEFAULT_LLM_MODEL
+    ).strip()
+    model_llm = raw_llm or DEFAULT_LLM_MODEL
+
+    raw_embedding = os.getenv("MODEL_EMBEDDING", DEFAULT_EMBEDDING_MODEL).strip()
+    model_embedding = raw_embedding or DEFAULT_EMBEDDING_MODEL
 
     return AppSettings(
-        gemini_api_key=api_key,
-        gemini_model=model_name,
+        api_key=api_key,
+        base_url=base_url,
+        model_llm=model_llm,
+        model_embedding=model_embedding,
     )
-
