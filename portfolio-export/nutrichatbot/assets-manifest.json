@@ -12,17 +12,17 @@
         "id": "Tampilan desktop NutriChatBot Tanya Gizi memperlihatkan percakapan nilai makronutrisi faktual dan rujukan ChromaDB serta SQLite."
       },
       "caption": {
-        "en": "Real-time streaming nutrition Q&A tab displaying grounded Indonesian food data, medical disclaimer, and retrieval references.",
-        "id": "Tab tanya-jawab gizi streaming real-time yang menampilkan data pangan Indonesia terverifikasi, disclaimer medis, dan referensi retrieval."
+        "en": "Real-time streaming nutrition Q&A tab displaying grounded Indonesian food data, medical disclaimer, and quick suggestion chips.",
+        "id": "Tab tanya-jawab gizi streaming real-time yang menampilkan data pangan Indonesia terverifikasi, disclaimer medis, dan chip pertanyaan cepat."
       },
       "width": 1600,
       "height": 1000,
-      "bytes": 25280,
-      "sha256": "a88dd2e344a17981748f5e076233dba7ab7ee02755d96b4f73dd2db789bc83d5",
+      "bytes": 28228,
+      "sha256": "8b5a7f4382f3148c8a02963344886720452d90b8af49d8003228b7523edb1cab",
       "previewWidth": 600,
       "previewHeight": 375,
-      "previewBytes": 4682,
-      "previewSha256": "b3961929be5dab668c3cccfc0ac10d19e44fb1e7838ea35c9bbf0feab3bb7bb8",
+      "previewBytes": 5004,
+      "previewSha256": "ca18e574d76e9f894b66293359fac8d8f20cee211995ba41c453212e81e045e8",
       "isCover": true
     },
     {
@@ -42,12 +42,12 @@
       },
       "width": 1600,
       "height": 1000,
-      "bytes": 88738,
-      "sha256": "f69329e62f7fe40af7d8490ff3c7eb354e60feaa4c6fc9ebfbbccdab46dcbdb7",
+      "bytes": 107552,
+      "sha256": "d2236c9462c0d0330d6f2998e03654511291ffb5c9d40b998a522b35ad0b570d",
       "previewWidth": 600,
       "previewHeight": 375,
-      "previewBytes": 15308,
-      "previewSha256": "3c91c9dc99ac0214a685e4269d3392094260dfb145fd3324bda8fe6326bd7601",
+      "previewBytes": 18062,
+      "previewSha256": "17f5742488eb16eea205b9dcdf1654be7aaeeb3607f5772f6fa19daeb63d5ae0",
       "isCover": false
     },
     {
@@ -58,8 +58,8 @@
         "id": "Perbandingan Visual Kandungan Gizi Bahan Pangan"
       },
       "alt": {
-        "en": "Side-by-side nutritional comparison between two Indonesian foods with macro metrics and Altair bar chart.",
-        "id": "Perbandingan nutrisi berdampingan antara dua pangan Indonesia dilengkapi metrik makro dan grafik batang Altair."
+        "en": "Side-by-side nutritional comparison between two Indonesian foods with macro metrics, quick takeaways, and Altair bar chart.",
+        "id": "Perbandingan nutrisi berdampingan antara dua pangan Indonesia dilengkapi metrik makro, ringkasan cepat, dan grafik batang Altair."
       },
       "caption": {
         "en": "Side-by-side macronutrient analytics comparing caloric density, proteins, fats, and carbohydrates across 1,346 items.",
@@ -67,12 +67,12 @@
       },
       "width": 1600,
       "height": 1000,
-      "bytes": 81816,
-      "sha256": "722a919f70ce22caf160c3035de8d8f8d8b8bfe2443add75abe1f5176c910f0c",
+      "bytes": 100778,
+      "sha256": "16d0fc35529770a995c97eba0a5b4fb0c24f5338b4138d0dd22851e27bdb8023",
       "previewWidth": 600,
       "previewHeight": 375,
-      "previewBytes": 14554,
-      "previewSha256": "2c1bb71a7e033adadae756a39794285a12eefe63e53b0255d5e77a37521e45bd",
+      "previewBytes": 17654,
+      "previewSha256": "5bf0a73787b5b904e1d47b5caa4161dcf0bf26ee1d5267096f5f97241d35df45",
       "isCover": false
     },
     {
@@ -92,12 +92,12 @@
       },
       "width": 1600,
       "height": 1000,
-      "bytes": 94906,
-      "sha256": "40a9f6cd62a8886026f2ffc5bd2e5069504275c51de32f4ed6c7a6c3080403bc",
+      "bytes": 99830,
+      "sha256": "0b4f156bf321b76ef00473a121f54fe48d8be0cb319c9387d1a443c2d98a6ae7",
       "previewWidth": 600,
       "previewHeight": 375,
-      "previewBytes": 15716,
-      "previewSha256": "6c8817064af5aa129df46eba51312f9b1e2fabc209fac99aa7e42746def22e27",
+      "previewBytes": 16726,
+      "previewSha256": "74f4880a2beaa4deb0ce0e9c0c63466f9725ff47449736626b392ce1fe2eebc9",
       "isCover": false
     },
     {
@@ -117,12 +117,12 @@
       },
       "width": 390,
       "height": 844,
-      "bytes": 18850,
-      "sha256": "d875571d1b8dbc3a3371fef5dd19f3cc763725afb1fc399914cbee431c5967d6",
+      "bytes": 18864,
+      "sha256": "f727b70838a09098a5e5d12e692b9a28bba75d6b3fc2ca18906d790d88848cda",
       "previewWidth": 390,
       "previewHeight": 844,
-      "previewBytes": 14616,
-      "previewSha256": "f1674fdc9f6a897cfad188d53a8c56bf0ecf96415b93f85ed34441747e6076c8",
+      "previewBytes": 14810,
+      "previewSha256": "4c20fa30d048082007848b93847c2114de978ab3d0c9ae5555266a25cc163a5f",
       "isCover": false
     },
     {
