@@ -9,7 +9,7 @@ from pathlib import Path
 from config import DEFAULT_CHROMA_PATH, DEFAULT_CSV_PATH, DEFAULT_DB_PATH, get_logger, load_settings
 from services.database import load_and_validate_csv, save_nutrition_to_sqlite
 from services.embeddings import (
-    create_gemini_embedding_function,
+    create_embedding_function,
     get_chroma_client,
     index_nutrition_data,
 )
@@ -64,7 +64,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--skip-chroma",
         action="store_true",
-        help="Only rebuild SQLite database without calling Gemini Embeddings API.",
+        help="Only rebuild SQLite database without calling Embeddings API.",
     )
     return parser.parse_args(argv)
 
@@ -88,8 +88,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.clean:
         clean_chroma_directory(args.chroma)
 
-    assert settings.gemini_api_key is not None
-    embedding_fn = create_gemini_embedding_function(settings.gemini_api_key)
+    assert settings.api_key is not None
+    embedding_fn = create_embedding_function(
+        api_key=settings.api_key,
+        base_url=settings.base_url,
+        model_name=settings.model_embedding,
+    )
     client = get_chroma_client(args.chroma)
     indexed = index_nutrition_data(df=df, client=client, embedding_function=embedding_fn)
     logger.info("ChromaDB rebuild complete: %d documents indexed.", indexed)
@@ -98,4 +102,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
