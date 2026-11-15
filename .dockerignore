@@ -1,0 +1,32 @@
+# Git & Secrets
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Local virtual environment
+.venv/
+venv/
+ENV/
+
+# Persistence & Local DBs
+chroma/
+*.db
+*.sqlite3
+
+# Test & IDE
+.pytest_cache/
+.coverage
+htmlcov/
+.vscode/
+.idea/
+.devcontainer/
