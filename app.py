@@ -64,6 +64,55 @@ def get_cached_chroma_client(chroma_path: str) -> Any:
     return get_chroma_client(chroma_path)
 
 
+def _inject_custom_styles() -> None:
+    """Inject clean, modern, user-friendly CSS styles into Streamlit app."""
+    st.markdown(
+        """
+        <style>
+        /* Modern container spacing */
+        .main .block-container {
+            padding-top: 1.8rem;
+            padding-bottom: 2.5rem;
+            max-width: 1100px;
+        }
+        /* Metric card styling */
+        div[data-testid="stMetric"] {
+            background-color: rgba(28, 38, 56, 0.45);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 14px 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        div[data-testid="stMetric"]:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+        div[data-testid="stMetricLabel"] {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+        div[data-testid="stMetricValue"] {
+            font-size: 1.55rem;
+            font-weight: 700;
+        }
+        /* Friendly button styling */
+        .stButton button {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+        /* Clean chat message borders */
+        .stChatMessage {
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 @st.cache_resource
 def get_cached_embedding_fn(api_key: str, base_url: str, model_name: str) -> Any:
     """Cache the OpenAI/SumoPod embedding function across Streamlit reruns."""
@@ -144,14 +193,34 @@ def _render_tanya_gizi(
             },
         ]
 
+    # Handle quick suggestion click if selected
+    if st.session_state.get("suggested_rag_query"):
+        st.session_state["rag_query_input"] = st.session_state.pop("suggested_rag_query")
+
     # Display past conversation history
     for msg in st.session_state.chat_messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
             if msg.get("contexts"):
-                with st.expander("Referensi Konteks Nutrisi (ChromaDB + SQLite)"):
+                with st.expander("📚 Rujukan Data Nutrisi (Katalog Komposisi Pangan)"):
                     for doc in msg["contexts"]:
                         st.markdown(f"- {doc}")
+
+    # Quick suggestion chips for laypersons
+    st.markdown("##### 💡 Contoh Pertanyaan Cepat (Klik untuk Bertanya):")
+    chip_cols = st.columns(4)
+    if chip_cols[0].button("🍗 Dada Ayam vs Paha", key="chip_ayam", use_container_width=True):
+        st.session_state["suggested_rag_query"] = "Berapa kalori dan protein dalam dada ayam fillet?"
+        st.rerun()
+    if chip_cols[1].button("🍳 Sepiring Nasi Goreng", key="chip_nasgor", use_container_width=True):
+        st.session_state["suggested_rag_query"] = "Berapa kalori sepiring nasi goreng telur?"
+        st.rerun()
+    if chip_cols[2].button("🥑 Lemak Baik Alpukat", key="chip_alpukat", use_container_width=True):
+        st.session_state["suggested_rag_query"] = "Berapa kalori dan lemak sehat dalam satu buah alpukat?"
+        st.rerun()
+    if chip_cols[3].button("🥗 Camilan Rendah Gula", key="chip_camilan", use_container_width=True):
+        st.session_state["suggested_rag_query"] = "Makanan apa yang tinggi serat dan rendah gula untuk diet?"
+        st.rerun()
 
     # Query Input area
     col_input, col_clear = st.columns([5, 1])
@@ -162,9 +231,11 @@ def _render_tanya_gizi(
             key="rag_query_input",
         )
     with col_clear:
-        if st.button("Hapus Chat", key="clear_chat_button"):
+        if st.button("Hapus Chat", key="clear_chat_button", help="Bersihkan riwayat percakapan"):
             st.session_state.chat_messages = []
             st.rerun()
+
+    st.caption("💡 **Tips untuk Anda:** Anda bisa menanyakan nama makanan Indonesia, kandungan gizi makro, atau perbandingan antar makanan.")
 
     if st.button("Cari Jawaban", key="rag_query_button"):
         cleaned_query = (user_query or "").strip()
@@ -211,17 +282,32 @@ def _render_recipe_generator(llm_client: Any, model_name: str) -> None:
     """Render the ingredient-based healthy recipe generator tab with diet filters."""
     st.header("🍳 Masak Apa Hari Ini?")
     st.write(
-        "Berikan daftar bahan-bahan yang Anda miliki (dipisahkan koma), "
-        "dan dapatkan ide resep sehat lengkap."
+        "Punya bahan di dapur dan bingung mau masak apa? Tulis bahan yang Anda miliki, "
+        "dan NutriChatBot akan meracikkan ide hidangan sehat, lezat, dan bergizi seimbang."
     )
 
+    if st.session_state.get("suggested_recipe"):
+        st.session_state["recipe_ingredients"] = st.session_state.pop("suggested_recipe")
+
+    st.markdown("##### 🥦 Pilihan Cepat Kombinasi Bahan:")
+    r1, r2, r3 = st.columns(3)
+    if r1.button("🍗 Ayam + Brokoli + Wortel", key="rec_ayam", use_container_width=True):
+        st.session_state["suggested_recipe"] = "dada ayam fillet, brokoli, wortel, bawang putih"
+        st.rerun()
+    if r2.button("🌱 Tahu + Tempe + Bayam", key="rec_nabati", use_container_width=True):
+        st.session_state["suggested_recipe"] = "tahu putih, tempe, bayam, bawang merah"
+        st.rerun()
+    if r3.button("🐟 Ikan Kembung + Tomat", key="rec_ikan", use_container_width=True):
+        st.session_state["suggested_recipe"] = "ikan kembung, tomat merah, jeruk nipis, kemangi"
+        st.rerun()
+
     ingredients = st.text_input(
-        "Bahan-bahan:",
+        "Bahan-bahan yang Anda miliki (pisahkan koma):",
         placeholder="Contoh: ayam, brokoli, bawang putih",
         key="recipe_ingredients",
     )
     diet_pref = st.selectbox(
-        "Preferensi Diet:",
+        "Preferensi Diet / Kondisi Kesehatan:",
         [
             "Biasa (Tanpa Preferensi)",
             "Tinggi Protein",
@@ -233,6 +319,17 @@ def _render_recipe_generator(llm_client: Any, model_name: str) -> None:
         ],
         key="recipe_diet_pref",
     )
+
+    diet_guides = {
+        "Biasa (Tanpa Preferensi)": "Pola makan seimbang harian dengan bahan segar.",
+        "Tinggi Protein": "Memprioritaskan lauk pembangun otot dan menjaga rasa kenyang lebih lama.",
+        "Rendah Garam (Hipertensi)": "Membatasi garam dapur, kecap asin, dan bahan tinggi natrium.",
+        "Rendah Gula (Diabetes)": "Bebas gula pasir atau pemanis sirup, ramah kestabilan gula darah.",
+        "Vegetarian": "Bebas daging hewani (masih memperbolehkan telur dan susu).",
+        "Vegan": "100% nabati murni (tanpa daging, telur, susu, atau madu).",
+        "Bebas Gluten": "Bebas tepung gandum/terigu, aman untuk lambung sensitif/celiac.",
+    }
+    st.caption(f"ℹ️ **Panduan Pilihan:** {diet_guides.get(diet_pref, '')}")
 
     if st.button("Dapatkan Resep", key="get_recipe_button"):
         with st.spinner("Meracik ide resep sehat..."):
@@ -295,7 +392,16 @@ def _render_recipe_generator(llm_client: Any, model_name: str) -> None:
 def _render_weekly_planner(llm_client: Any, model_name: str) -> None:
     """Render the 7-day calorie-targeted meal planner tab with BMR/TDEE calculator."""
     st.header("📅 Perencana Menu Mingguan")
-    st.write("Buat rencana menu makanan sehat selama 7 hari sesuai kebutuhan kalori harian Anda.")
+    st.write(
+        "Rencanakan pola makan sehat selama 7 hari sesuai target kalori harian Anda. "
+        "Menu disusun praktis, lezat, dan mudah dimasak di rumah."
+    )
+
+    st.info(
+        "💡 **Panduan Pemula:** Setiap orang memiliki kebutuhan kalori harian yang berbeda. "
+        "Jika belum mengetahui kebutuhan kalori harian Anda, buka kalkulator di bawah ini "
+        "agar rencana menu sesuai dengan postur dan aktivitas tubuh Anda."
+    )
 
     expand_calc = st.query_params.get("demo") == "1"
     with st.expander("⚖️ Hitung Kebutuhan Kalori Saya (Kalkulator BMR & TDEE)", expanded=expand_calc):
@@ -316,17 +422,17 @@ def _render_weekly_planner(llm_client: Any, model_name: str) -> None:
             )
 
         calc_activity = st.selectbox(
-            "Tingkat Aktivitas Fisik:",
+            "Tingkat Aktivitas Fisik Sehari-hari:",
             [
-                "Sedentary (Jarang/Tidak Berolahraga)",
+                "Sedentary (Jarang/Tidak Berolahraga - Banyak Duduk)",
                 "Light (Olahraga Ringan 1-3 hari/minggu)",
                 "Moderate (Olahraga Sedang 3-5 hari/minggu)",
-                "Very Active (Olahraga Berat 6-7 hari/minggu)",
+                "Very Active (Olahraga Berat / Pekerja Fisik 6-7 hari)",
             ],
             key="bmr_activity",
         )
         calc_goal = st.selectbox(
-            "Tujuan Berat Badan:",
+            "Tujuan Berat Badan Anda:",
             [
                 "Turun Berat Badan (Defisit Sehat -500 kcal)",
                 "Pertahankan Berat Badan (Maintenance)",
@@ -362,15 +468,23 @@ def _render_weekly_planner(llm_client: Any, model_name: str) -> None:
             )
 
             st.session_state["calculated_target_cal"] = plan["target_calories"]
+
+            bmi_badge = "🟢 Ideal" if "Normal" in plan["bmi_category"] else "🟡 Perlu Perhatian"
             st.success(
-                f"Hasil: BMR Anda **{plan['bmr']} kcal**, TDEE **{plan['tdee']} kcal**.\n\n"
-                f"Rekomendasi Kalori Target: **{plan['target_calories']} kcal/hari** "
-                f"(Status BMI: **{plan['bmi_category']}** - {plan['bmi']})."
+                f"🎉 **Hasil Analisis Tubuh Anda:**\n\n"
+                f"- **Kebutuhan Kalori Target:** `{plan['target_calories']} kcal/hari`\n"
+                f"- **Indeks Massa Tubuh (BMI):** `{plan['bmi']} ({plan['bmi_category']})` {bmi_badge}\n"
+                f"- **BMR:** `{plan['bmr']} kcal` *(energi minimal saat istirahat)* | **TDEE:** `{plan['tdee']} kcal` *(total bakar harian)*"
             )
+
+            st.markdown("##### 🍽️ Rekomendasi Porsi Makronutrisi Seimbang (Isi Piringku):")
             col_p, col_f, col_c = st.columns(3)
-            col_p.metric("Target Protein", f"{plan['macros']['protein_g']}g")
-            col_f.metric("Target Lemak", f"{plan['macros']['fat_g']}g")
-            col_c.metric("Target Karbohidrat", f"{plan['macros']['carb_g']}g")
+            col_p.metric("Target Protein (25%)", f"{plan['macros']['protein_g']}g")
+            col_f.metric("Target Lemak Sehat (25%)", f"{plan['macros']['fat_g']}g")
+            col_c.metric("Karbohidrat Kompleks (50%)", f"{plan['macros']['carb_g']}g")
+            st.caption(
+                "ℹ️ **Catatan:** Angka target kalori di atas otomatis digunakan pada kotak target di bawah."
+            )
 
     default_cal = st.session_state.get("calculated_target_cal", DEFAULT_DAILY_CALORIES)
     daily_calories = st.number_input(
@@ -411,9 +525,33 @@ def _render_food_comparison(db_path: str) -> None:
     """Render side-by-side nutrition comparison with interactive visual chart."""
     st.header("📊 Bandingkan Nilai Gizi Makanan")
     st.write(
-        "Bandingkan kandungan kalori dan makronutrisi antara dua makanan "
+        "Bandingkan kandungan kalori dan zat gizi makro antara dua jenis makanan "
         "(data berbasis standar 100 gram porsi dapat dimakan)."
     )
+
+    if st.session_state.get("suggested_f1"):
+        st.session_state["compare_food1_input"] = st.session_state.pop("suggested_f1")
+    if st.session_state.get("suggested_f2"):
+        st.session_state["compare_food2_input"] = st.session_state.pop("suggested_f2")
+
+    st.markdown("##### ⚖️ Contoh Perbandingan Populer:")
+    p1, p2, p3, p4 = st.columns(4)
+    if p1.button("Tempe vs Tahu", key="preset_tempe_tahu", use_container_width=True):
+        st.session_state["suggested_f1"] = "Tempe"
+        st.session_state["suggested_f2"] = "Tahu"
+        st.rerun()
+    if p2.button("Beras Putih vs Merah", key="preset_beras", use_container_width=True):
+        st.session_state["suggested_f1"] = "Beras giling"
+        st.session_state["suggested_f2"] = "Beras merah"
+        st.rerun()
+    if p3.button("Dada Ayam vs Sapi", key="preset_daging", use_container_width=True):
+        st.session_state["suggested_f1"] = "Dada ayam"
+        st.session_state["suggested_f2"] = "Daging sapi"
+        st.rerun()
+    if p4.button("Telur vs Ikan Kembung", key="preset_ikan", use_container_width=True):
+        st.session_state["suggested_f1"] = "Telur ayam"
+        st.session_state["suggested_f2"] = "Ikan kembung"
+        st.rerun()
 
     col1, col2 = st.columns(2)
     with col1:
@@ -446,6 +584,25 @@ def _render_food_comparison(db_path: str) -> None:
 
         f1 = matches1[0]
         f2 = matches2[0]
+
+        # Quick Takeaway Highlights for Laypersons
+        cal_diff = abs(float(f1["calories"]) - float(f2["calories"]))
+        prot_diff = abs(float(f1["proteins"]) - float(f2["proteins"]))
+        lower_cal = f1["name"] if float(f1["calories"]) <= float(f2["calories"]) else f2["name"]
+        higher_prot = f1["name"] if float(f1["proteins"]) >= float(f2["proteins"]) else f2["name"]
+
+        st.markdown("##### 💡 Analisis Cepat untuk Anda:")
+        t1, t2 = st.columns(2)
+        with t1:
+            st.info(
+                f"🥗 **Lebih Rendah Kalori:** `{lower_cal}` "
+                f"(selisih ~{cal_diff:.0f} kkal per 100g). Cocok untuk program defisit kalori."
+            )
+        with t2:
+            st.info(
+                f"🍗 **Lebih Tinggi Protein:** `{higher_prot}` "
+                f"(selisih ~{prot_diff:.1f}g per 100g). Membantu menjaga rasa kenyang lebih lama."
+            )
 
         st.divider()
         c1, c2 = st.columns(2)
@@ -481,7 +638,28 @@ def _render_food_comparison(db_path: str) -> None:
 def _render_healthy_alternatives(llm_client: Any, model_name: str) -> None:
     """Render the healthy ingredient substitution tab."""
     st.header("🥗 Alternatif Sehat")
-    st.write("Masukkan bahan makanan yang ingin Anda cari alternatif lebih sehatnya.")
+    st.write(
+        "Ingin hidup lebih sehat tetapi bingung mencari pengganti bahan masakan favorit? "
+        "Tulis bahan makanan yang ingin Anda ganti, dan temukan alternatif yang lebih ramah tubuh."
+    )
+
+    if st.session_state.get("suggested_alt"):
+        st.session_state["healthy_alternative_input"] = st.session_state.pop("suggested_alt")
+
+    st.markdown("##### 🔄 Bahan yang Sering Ingin Diganti:")
+    a1, a2, a3, a4 = st.columns(4)
+    if a1.button("Gula Pasir", key="alt_gula", use_container_width=True):
+        st.session_state["suggested_alt"] = "gula pasir"
+        st.rerun()
+    if a2.button("Minyak Kelapa Sawit", key="alt_minyak", use_container_width=True):
+        st.session_state["suggested_alt"] = "minyak goreng kelapa sawit"
+        st.rerun()
+    if a3.button("Santan Kental", key="alt_santan", use_container_width=True):
+        st.session_state["suggested_alt"] = "santan kental"
+        st.rerun()
+    if a4.button("Tepung Terigu", key="alt_terigu", use_container_width=True):
+        st.session_state["suggested_alt"] = "tepung terigu"
+        st.rerun()
 
     ingredient = st.text_input(
         "Bahan yang ingin diganti:",
@@ -514,7 +692,11 @@ def _render_index_data(
     embedding_fn: Any,
 ) -> None:
     """Render the dataset ingestion and ChromaDB re-indexing administration tab."""
-    st.header("⚙️ Index Data Nutrisi")
+    st.header("⚙️ Pengaturan & Indeks Data (Admin)")
+    st.warning(
+        "⚠️ **Area Khusus Administrator:** Halaman ini digunakan untuk memuat ulang dataset pangan "
+        "ke database SQLite & ChromaDB. Pengguna umum tidak perlu menjalankan fungsi ini untuk konsultasi gizi."
+    )
     st.write(
         "Muat ulang dataset dari `data/nutrition.csv` ke database SQLite dan bangun ulang "
         "index vektor ChromaDB untuk fitur Tanya Gizi (RAG)."
@@ -550,12 +732,18 @@ def main() -> None:
     """Main Streamlit application entrypoint."""
     st.set_page_config(
         page_title="NutriChatBot: Asisten Gizi & Resep Sehat",
+        page_icon="🥗",
         layout="wide",
         initial_sidebar_state="expanded",
     )
 
+    _inject_custom_styles()
+
     st.title("NutriChatBot: Asisten Gizi & Resep Sehat 🍎🥕")
-    st.markdown("Asisten pribadi Anda untuk nutrisi, resep sehat, dan kalkulator gizi.")
+    st.markdown(
+        "Teman cerdas Anda untuk berkonsultasi seputar nutrisi makanan, ide masakan sehat, "
+        "kalkulator kalori personal, dan perbandingan gizi praktis."
+    )
 
     try:
         settings = load_settings(require_api_key=True)
@@ -602,23 +790,34 @@ def main() -> None:
                 break
 
     with st.sidebar:
-        st.header("Menu")
+        st.markdown("## 🥗 NutriChatBot")
+        st.caption("Panduan Gizi & Hidup Sehat Nusantara")
+
+        st.markdown("---")
+        st.markdown("#### 🧭 Menu Layanan")
         menu_selection = st.radio(
             "Pilih Opsi",
             menu_options,
             index=default_idx,
+            label_visibility="collapsed",
         )
 
-        st.divider()
-        st.subheader("Informasi Sistem")
-        st.write(f"**Model LLM:** `{settings.model_llm}`")
-        st.write(f"**Model Embedding:** `{settings.model_embedding}`")
-        st.write(f"**Endpoint:** `{settings.base_url}`")
-        st.write(f"**Database SQLite:** {sqlite_count} item")
-        st.write(f"**Index Vektor:** {chroma_count} dokumen")
+        st.markdown("---")
+        st.markdown("#### 🟢 Status Asisten")
+        st.caption("✅ Terhubung & Siap Melayani")
+        st.markdown(f"📚 **Katalog Pangan:** `{sqlite_count} makanan`")
+        st.markdown("🏛️ **Rujukan:** DKBM Kemenkes RI")
 
         if sqlite_count == 0 or chroma_count == 0:
             st.warning("Data belum diindeks. Buka menu 'Index Data' untuk memuat dataset nutrisi.")
+
+        st.markdown("---")
+        with st.expander("🛠️ Detail Sistem (Teknis)", expanded=False):
+            st.write(f"**Model LLM:** `{settings.model_llm}`")
+            st.write(f"**Model Embedding:** `{settings.model_embedding}`")
+            st.write(f"**Endpoint:** `{settings.base_url}`")
+            st.write(f"**Database SQLite:** {sqlite_count} item")
+            st.write(f"**Index Vektor:** {chroma_count} dokumen")
 
     if menu_selection == "Tanya Gizi":
         _render_tanya_gizi(
