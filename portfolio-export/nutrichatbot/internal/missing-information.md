@@ -14,7 +14,7 @@ The following items **cannot be verified** from codebase or local repository ins
 | :--- | :--- | :--- |
 | **Active User Count (MAU / DAU)** | **Belum Terverifikasi** (No analytics SDK or user database table). | State project is an engineered functional system / prototype, not a scaled public consumer app. |
 | **Real-World Latency SLA Under Load** | **Belum Terverifikasi** (No load test reports e.g. Locust / k6). | Note sub-second execution on local test suites only; avoid claiming global production p99 SLA. |
-| **Cloud Hosting URL** | **Belum Terverifikasi** (No live production public domain bound). | Provide GitHub repository link; omit live public demo URL unless user sets up deployment. |
+| **Cloud Hosting URL** | **Terverifikasi** (Streamlit Community Cloud: https://nutrichatbot.streamlit.app/). | Tautkan URL demo resmi pada portofolio; catat bahwa instance gratis dapat masuk ke mode sleep jika tidak ada kunjungan berkala. |
 | **User Retention / Diet Adherence** | **Belum Terverifikasi** (No longitudinal clinical trial data). | Highlight clinical formulation (Mifflin-St Jeor standard), not empirical patient weight loss. |
 
 ---

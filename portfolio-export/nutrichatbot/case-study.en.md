@@ -2,6 +2,7 @@
 
 **Author:** Naufal Firdaus  
 **Repository:** [https://github.com/victoriavals/NutriChatBot](https://github.com/victoriavals/NutriChatBot)  
+**Live Demo:** [https://nutrichatbot.streamlit.app/](https://nutrichatbot.streamlit.app/)  
 **Primary Stack:** Python 3.12, Streamlit, ChromaDB, SQLite, OpenAI SDK / SumoPod AI, GLM-5.3-flash, Docker  
 **Date:** November 15, 2026 (Updated with User-Centered UI/UX Architecture)  
 
@@ -180,6 +181,7 @@ $$\text{TDEE} = \text{BMR} \times \text{Activity Multiplier}$$
 | **SumoPod AI + GLM-5.3-flash** | Direct Google Gemini or OpenAI GPT-4o | SumoPod AI provides high-availability OpenAI-compatible endpoints with GLM-5.3-flash, offering superior reasoning throughput at lower operational costs, verified via local streaming tests. |
 | **Mifflin-St Jeor Standard** | Harris-Benedict (1919) | The American Dietetic Association (ADA) confirmed Mifflin-St Jeor is significantly more accurate (within 10% of measured RMR in over 82% of individuals) compared to Harris-Benedict, which overestimates BMR by up to 15%. |
 | **Local SQLite + ChromaDB** | Managed Cloud Database (Pinecone / Supabase) | Eliminates external latency and cloud hosting costs for the 1,346-item dataset, enabling completely offline, reproducible local development and containerized portability. |
+| **Streamlit Community Cloud Deployment** | Self-hosted VPS / AWS EC2 | Provides zero-cost public hosting with direct continuous deployment from GitHub `main` branch, featuring secure UI-based secrets management without infrastructure maintenance overhead. |
 | **Streamlit Testing (`AppTest`)** | Headless Selenium / Playwright | Streamlit's native `AppTest` enables sub-second headless execution of complete UI state machines inside standard `pytest` without spinning up heavyweight browser processes. |
 
 ---
@@ -198,6 +200,8 @@ The implementation has been verified through multiple rigorous testing layers:
    - Evaluated with **Ruff** across all workspace files: `All checks passed!` (zero lint warnings, strict PEP 8 and typing compliance).
 4. **Visual UI Verification:**
    - Captured 6 high-fidelity visual assets directly from the running Streamlit server via Chrome DevTools Protocol (CDP), validating updated responsive desktop (1600x1000) and mobile (390x844) layouts featuring the new suggestion chips and design tokens.
+5. **Public Cloud Deployment Verification:**
+   - Official public production domain configured and live at **[https://nutrichatbot.streamlit.app/](https://nutrichatbot.streamlit.app/)**, automatically synchronized with GitHub `main` branch with SumoPod AI secrets management.
 
 ---
 

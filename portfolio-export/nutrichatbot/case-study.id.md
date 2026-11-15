@@ -2,6 +2,7 @@
 
 **Penulis:** Naufal Firdaus  
 **Repository:** [https://github.com/victoriavals/NutriChatBot](https://github.com/victoriavals/NutriChatBot)  
+**Demo Publik:** [https://nutrichatbot.streamlit.app/](https://nutrichatbot.streamlit.app/)  
 **Teknologi Utama:** Python 3.12, Streamlit, ChromaDB, SQLite, OpenAI SDK / SumoPod AI, GLM-5.3-flash, Docker  
 **Tanggal:** 15 November 2026 (Diperbarui dengan Arsitektur UI/UX Berpusat pada Pengguna)  
 
@@ -180,6 +181,7 @@ $$\text{TDEE} = \text{BMR} \times \text{Faktor Aktivitas}$$
 | **SumoPod AI + GLM-5.3-flash** | Google Gemini atau OpenAI GPT-4o langsung | SumoPod AI menyediakan gateway kompatibel OpenAI dengan model penalaran GLM-5.3-flash yang menawarkan efisiensi biaya dan performa inferensi tinggi pada pengujian lokal. |
 | **Formula Mifflin-St Jeor** | Harris-Benedict (1919) | American Dietetic Association (ADA) merekomendasikan Mifflin-St Jeor sebagai formula paling akurat secara klinis (deviasi di bawah 10% pada lebih dari 82% subjek uji) dibandingkan Harris-Benedict yang kerap melebih-lebihkan kalori hingga 15%. |
 | **SQLite Lokal + ChromaDB** | Database Vektor Cloud (Pinecone / Supabase) | Menghilangkan latensi jaringan eksternal dan biaya sewa cloud untuk dataset 1.346 record, memungkinkan pengembangan offline mandiri dan portabilitas kontainer penuh. |
+| **Streamlit Community Cloud Deployment** | Self-hosted VPS / AWS EC2 | Menyediakan hosting publik nir-biaya yang terhubung langsung dengan branch main GitHub, dilengkapi fitur Continuous Deployment dan manajemen secrets yang aman untuk API key tanpa kerumitan administrasi server. |
 | **Pengujian Streamlit (`AppTest`)** | Headless Selenium / Playwright | Streamlit `AppTest` memungkinkan simulasi siklus hidup UI secara headless dalam hitungan milidetik di dalam `pytest` tanpa perlu menjalankan peramban berat. |
 
 ---
@@ -198,6 +200,8 @@ Implementasi sistem telah diverifikasi secara menyeluruh melalui beberapa lapisa
    - Diperiksa menggunakan **Ruff** pada seluruh repositori: `All checks passed!` (nol warning, kepatuhan penuh PEP 8 dan type hinting).
 4. **Verifikasi Visual Antarmuka:**
    - Berhasil mengambil 6 aset visual berkualitas tinggi langsung dari aplikasi Streamlit yang sedang berjalan via Chrome DevTools Protocol (CDP), mengonfirmasi tata letak desktop (1600x1000) dan seluler (390x844) dengan tombol *chip* dan gaya visual terbaru.
+5. **Verifikasi Deployment Cloud Publik:**
+   - Domain publik resmi terkonfigurasi pada **[https://nutrichatbot.streamlit.app/](https://nutrichatbot.streamlit.app/)**, disinkronkan secara otomatis dari branch `main` GitHub dengan manajemen secrets SumoPod AI.
 
 ---
 

@@ -61,3 +61,13 @@ All visual assets were recaptured live via **Chrome DevTools Protocol (CDP)** ag
 - `06-arsitektur-hybrid-rag.webp`: 1600x1000 px, 171,876 bytes (end-to-end 5-tier architecture diagram).
 
 All images accompanied by `-preview.webp` lightweight thumbnails for optimal portfolio performance.
+
+---
+
+## 4. Cloud Deployment & Public Access Verification
+
+- **Hosting Platform:** Streamlit Community Cloud
+- **Public Domain:** [https://nutrichatbot.streamlit.app/](https://nutrichatbot.streamlit.app/)
+- **Integration:** Synchronized with GitHub repository `victoriavals/NutriChatBot` on branch `main`.
+- **Secrets Management:** Injected via Streamlit Cloud dashboard (`API_KEY`, `BASE_URL`, `MODEL_LLM`, `MODEL_EMBEDDING`).
+- **Sleep Mode Policy:** Standard community cloud auto-sleep after prolonged inactivity, with 1-click container wake-up.

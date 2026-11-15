@@ -78,6 +78,6 @@
     "repository": "https://github.com/victoriavals/NutriChatBot.git",
     "author": "Naufal Firdaus (victoriavals)",
     "license": "Open Source (as declared in repository)",
-    "demoUrl": null
+    "demoUrl": "https://nutrichatbot.streamlit.app/"
   }
 }

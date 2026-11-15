@@ -1,5 +1,6 @@
 # NutriChatBot 🍎🥕
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://nutrichatbot.streamlit.app/)
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/frontend-Streamlit-FF4B4B.svg)](https://streamlit.io/)
 [![AI Provider](https://img.shields.io/badge/AI-SumoPod%20AI%20%2F%20GLM--5.3--flash-orange.svg)](https://ai.sumopod.com/)
@@ -10,7 +11,8 @@
 [![Docker](https://img.shields.io/badge/docker-ready-2496ED.svg)](Dockerfile)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **Asisten Nutrisi, Pola Makan Sehat, dan Rekomendasi Menu Cerdas Nusantara Berbasis Dual-Engine Hybrid RAG & Mifflin-St Jeor.**
+> **Asisten Nutrisi, Pola Makan Sehat, dan Rekomendasi Menu Cerdas Nusantara Berbasis Dual-Engine Hybrid RAG & Mifflin-St Jeor.**  
+> 🌐 **Live Demo Publik**: [https://nutrichatbot.streamlit.app/](https://nutrichatbot.streamlit.app/)
 
 ---
 
@@ -31,11 +33,12 @@
    - [Konfigurasi Environment (.env)](#konfigurasi-environment-env)
    - [Membangun Ulang Database & Indeks Vektor](#membangun-ulang-database--indeks-vektor)
    - [Menjalankan Aplikasi](#menjalankan-aplikasi)
-7. [Menjalankan dengan Docker](#-menjalankan-dengan-docker)
-8. [Pengujian Otomatis & Verifikasi Mutu](#-pengujian-otomatis--verifikasi-mutu)
-9. [Basis Data & Asal Data Pangan](#-basis-data--asal-data-pangan)
-10. [Kebijakan Keamanan & Privasi](#-kebijakan-keamanan--privasi)
-11. [Lisensi & Pengembang](#-lisensi--pengembang)
+7. [Deployment di Streamlit Community Cloud](#-deployment-di-streamlit-community-cloud)
+8. [Menjalankan dengan Docker](#-menjalankan-dengan-docker)
+9. [Pengujian Otomatis & Verifikasi Mutu](#-pengujian-otomatis--verifikasi-mutu)
+10. [Basis Data & Asal Data Pangan](#-basis-data--asal-data-pangan)
+11. [Kebijakan Keamanan & Privasi](#-kebijakan-keamanan--privasi)
+12. [Lisensi & Pengembang](#-lisensi--pengembang)
 
 ---
 
@@ -318,6 +321,25 @@ uv run streamlit run app.py
 
 Aplikasi akan otomatis terbuka di peramban web Anda pada alamat:  
 👉 **`http://localhost:8501`**
+
+---
+
+## 🚀 Deployment di Streamlit Community Cloud
+
+NutriChatBot telah dipublikasikan secara resmi di **Streamlit Community Cloud** dan dapat diakses publik langsung dari peramban web:
+
+🌐 **Akses Demo Publik**: **[https://nutrichatbot.streamlit.app/](https://nutrichatbot.streamlit.app/)**
+
+### Mekanisme & Karakteristik Deployment:
+1. **Continuous Deployment dari GitHub**: Repositori Streamlit Cloud terintegrasi dengan branch `main` GitHub (`victoriavals/NutriChatBot`). Setiap `git push` ke branch `main` akan memicu kompilasi container dan pembaruan aplikasi secara otomatis.
+2. **Pengaturan Secrets Produksi**: Sesuai prinsip keamanan data, file `.env` tidak pernah dikomit ke repositori. Kredensial produksi diatur melalui menu **Settings $\rightarrow$ Secrets** pada konsol [Streamlit Cloud](https://share.streamlit.io):
+   ```toml
+   API_KEY = "your_production_api_key"
+   BASE_URL = "https://ai.sumopod.com/v1"
+   MODEL_LLM = "glm-5.3-flash"
+   MODEL_EMBEDDING = "text-embedding-3-small"
+   ```
+3. **Penanganan Auto-Sleep**: Pada tier komunitas gratis Streamlit, aplikasi yang tidak menerima lalu lintas selama beberapa hari akan beralih ke mode tidur (*asleep*). Pengunjung cukup menekan tombol **"Yes, get this app back up!"** untuk mengaktifkan kembali server dalam 1–2 menit.
 
 ---
 
