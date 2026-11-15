@@ -1,4 +1,8 @@
-# NutriChatBot 🍎🥕
+<p align="center">
+  <img src="assets/logo.png" alt="NutriChatBot Logo" width="120" style="border-radius: 24px;" />
+</p>
+
+# NutriChatBot 🥗
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://nutrichatbot.streamlit.app/)
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)

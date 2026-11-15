@@ -25,7 +25,9 @@ nutrichatbot/
 │   ├── 05-tampilan-mobile-chat.webp
 │   ├── 05-tampilan-mobile-chat-preview.webp
 │   ├── 06-arsitektur-hybrid-rag.webp
-│   └── 06-arsitektur-hybrid-rag-preview.webp
+│   ├── 06-arsitektur-hybrid-rag-preview.webp
+│   ├── logo.png                   # Official 1024x1024 brand icon
+│   └── logo.webp                  # Optimized 1024x1024 brand icon
 └── internal/                  # Engineering audit & provenance records
     ├── evidence.md            # Traceability matrix mapping claims to lines & tests
     ├── missing-information.md # Unverified metrics boundary (zero fabricated data)

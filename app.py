@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 import pandas as pd
@@ -960,20 +961,33 @@ def _render_index_data(
 
 def main() -> None:
     """Main Streamlit application entrypoint."""
+    logo_path = "assets/logo.png" if os.path.exists("assets/logo.png") else None
+
     st.set_page_config(
         page_title="NutriChatBot: Asisten Gizi & Resep Sehat",
-        page_icon="🥗",
+        page_icon=logo_path if logo_path else "🥗",
         layout="wide",
         initial_sidebar_state="expanded",
     )
 
     _inject_custom_styles()
 
-    st.title("NutriChatBot: Asisten Gizi & Resep Sehat 🍎🥕")
-    st.markdown(
-        "Teman cerdas Anda untuk berkonsultasi seputar nutrisi makanan, ide masakan sehat, "
-        "kalkulator kalori personal, dan perbandingan gizi praktis."
-    )
+    if logo_path:
+        col_logo, col_header = st.columns([1, 9])
+        with col_logo:
+            st.image(logo_path, width=74)
+        with col_header:
+            st.title("NutriChatBot: Asisten Gizi & Resep Sehat")
+            st.markdown(
+                "Teman cerdas Anda untuk berkonsultasi seputar nutrisi makanan, ide masakan sehat, "
+                "kalkulator kalori personal, dan perbandingan gizi praktis."
+            )
+    else:
+        st.title("NutriChatBot: Asisten Gizi & Resep Sehat 🍎🥕")
+        st.markdown(
+            "Teman cerdas Anda untuk berkonsultasi seputar nutrisi makanan, ide masakan sehat, "
+            "kalkulator kalori personal, dan perbandingan gizi praktis."
+        )
 
     try:
         settings = load_settings(require_api_key=True)
@@ -1023,8 +1037,16 @@ def main() -> None:
                 break
 
     with st.sidebar:
-        st.markdown("## 🥗 NutriChatBot")
-        st.caption("Panduan Gizi & Hidup Sehat Nusantara")
+        if logo_path:
+            col_s_logo, col_s_text = st.columns([1, 3])
+            with col_s_logo:
+                st.image(logo_path, width=54)
+            with col_s_text:
+                st.markdown("### NutriChatBot")
+                st.caption("Panduan Gizi Nusantara")
+        else:
+            st.markdown("## 🥗 NutriChatBot")
+            st.caption("Panduan Gizi & Hidup Sehat Nusantara")
 
         st.markdown("---")
         st.markdown("#### 🧭 Menu Layanan")

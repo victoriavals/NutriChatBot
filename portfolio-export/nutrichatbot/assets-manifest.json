@@ -149,6 +149,31 @@
       "previewBytes": 32498,
       "previewSha256": "da7a59527ed51a3097b304b84362c746a62d580e41c5dfb95a543d53cdc6c6c6",
       "isCover": false
+    },
+    {
+      "filename": "logo.webp",
+      "preview": "logo.webp",
+      "title": {
+        "en": "NutriChatBot Brand Identity Logo Mark",
+        "id": "Logo Identitas Brand NutriChatBot"
+      },
+      "alt": {
+        "en": "Modern vector logo mark merging an emerald green chat bubble, fresh organic leaf, and golden AI sparkle on white background.",
+        "id": "Logo vektor modern yang memadukan gelembung percakapan hijau zamrud, daun organik segar, dan bintang kilau AI emas di atas latar putih."
+      },
+      "caption": {
+        "en": "Official brand identity logo mark symbolizing AI conversational guidance, natural nutrition, and vibrant health vitality.",
+        "id": "Logo identitas resmi yang melambangkan panduan percakapan AI, nutrisi alami, dan vitalitas kesehatan."
+      },
+      "width": 1024,
+      "height": 1024,
+      "bytes": 24316,
+      "sha256": "e40f939e640a6f5f627d7eb56c08b01d9b7836a2c4e72ad68de76b58f54b2b8c",
+      "previewWidth": 1024,
+      "previewHeight": 1024,
+      "previewBytes": 24316,
+      "previewSha256": "e40f939e640a6f5f627d7eb56c08b01d9b7836a2c4e72ad68de76b58f54b2b8c",
+      "isCover": false
     }
   ]
 }
