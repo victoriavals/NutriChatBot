@@ -3,7 +3,7 @@
 **Target Project:** NutriChatBot  
 **Commit Inspected:** `22eaaff` (and working tree updates)  
 **Author:** Naufal Firdaus (`victoriavals` / `naufalfirdaus282@gmail.com`)  
-**Audit Date:** 2026-11-15  
+**Audit Date:** 2026-11-15 (Updated with User-Centered UI/UX Engineering)  
 
 ---
 
@@ -19,7 +19,10 @@
 | **Clinical Risk Detection** | `services/llm.py`: Lines 125–155 (`detect_clinical_risk`, `CLINICAL_RISK_KEYWORDS`) | `tests/test_llm.py::test_detect_clinical_risk_identifies_keywords` (PASS) |
 | **Streaming Inference** | `services/llm.py`: Lines 180–230 (`answer_nutrition_question_stream`) | `tests/test_llm.py::test_answer_nutrition_question_stream_returns_stream_and_contexts` (PASS) |
 | **Sensitive Log Redaction** | `config.py`: Lines 55–69 (`SensitiveDataFilter`, `_API_KEY_PATTERN`) | `tests/test_config.py::test_sensitive_data_filter_redacts_keys` (PASS) |
-| **Multi-Tab Streamlit UI** | `app.py`: Lines 95–610 (Tanya Gizi, Resep, Perencana, Bandingkan, Alternatif) | `tests/test_app_ui.py::test_app_all_menus_happy_path_and_indexing` (PASS) |
+| **Custom CSS Styling** | `app.py`: Lines 66–115 (`_inject_custom_styles`) | `tests/test_app_ui.py::test_app_all_menus_happy_path_and_indexing` (PASS) |
+| **Layperson Prompt Chips** | `app.py`: Lines 205–225 (`chip_ayam`, `chip_nasgor`, `chip_alpukat`, `chip_camilan`) | Streamlit interactive state hydration verified via AppTest & CDP |
+| **Comparative Takeaway Cards** | `app.py`: Lines 555–580 (Automated lower calorie & higher protein diff logic) | Visual verification in `03-perbandingan-gizi-visual.webp` |
+| **Separated Developer Drawer** | `app.py`: Lines 795–810 (Collapsible telemetry expander in sidebar) | `tests/test_app_ui.py` sidebar assertion checks pass |
 | **Dataset Integrity** | `data/nutrition.csv`: 1,346 rows, verified schema & columns | `tests/test_data_integrity.py::test_repository_nutrition_csv_integrity` (PASS) |
 | **Database Anomaly Checks** | `services/database.py`: Lines 110–145 (`detect_nutrition_anomalies`) | `tests/test_database.py::test_detect_nutrition_anomalies_flags_implausible_macros` (PASS) |
 
@@ -32,7 +35,7 @@
 - **Total Tests:** 51
 - **Passed:** 51
 - **Failed:** 0
-- **Duration:** 6.18s
+- **Duration:** 5.85s
 - **Exit Code:** 0
 
 ### B. Dedicated QA End-to-End Suite (`scratch/qa_suite_runner.py`)
@@ -47,14 +50,14 @@
 
 ---
 
-## 3. Visual & UI Capture Verification
+## 3. Visual & UI Capture Verification (Updated UI)
 
-All visual assets were captured live via **Chrome DevTools Protocol (CDP)** against a running instance of `app.py`:
-- `01-tanya-gizi-chat.webp`: 1600x1000 px, 25,280 bytes.
-- `02-kalkulator-bmr-tdee-dan-menu.webp`: 1600x1000 px, 88,738 bytes.
-- `03-perbandingan-gizi-visual.webp`: 1600x1000 px, 81,816 bytes.
-- `04-generator-resep-sehat.webp`: 1600x1000 px, 94,906 bytes.
-- `05-tampilan-mobile-chat.webp`: 390x844 px, 18,850 bytes.
-- `06-arsitektur-hybrid-rag.webp`: 1600x1000 px, 171,876 bytes.
+All visual assets were recaptured live via **Chrome DevTools Protocol (CDP)** against the running instance of `app.py` incorporating the new user-centered design system:
+- `01-tanya-gizi-chat.webp`: 1600x1000 px, 28,228 bytes (featuring quick prompt chips and cleaner layout).
+- `02-kalkulator-bmr-tdee-dan-menu.webp`: 1600x1000 px, 107,552 bytes (featuring BMI badge and macro visualization).
+- `03-perbandingan-gizi-visual.webp`: 1600x1000 px, 100,778 bytes (featuring quick comparison presets and takeaway callouts).
+- `04-generator-resep-sehat.webp`: 1600x1000 px, 99,830 bytes (featuring ingredient chips and dietary guides).
+- `05-tampilan-mobile-chat.webp`: 390x844 px, 18,864 bytes (responsive mobile layout with accessible chips).
+- `06-arsitektur-hybrid-rag.webp`: 1600x1000 px, 171,876 bytes (end-to-end 5-tier architecture diagram).
 
 All images accompanied by `-preview.webp` lightweight thumbnails for optimal portfolio performance.
