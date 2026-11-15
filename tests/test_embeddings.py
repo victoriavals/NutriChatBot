@@ -13,9 +13,11 @@ import pytest
 
 from services.embeddings import (
     EmbeddingServiceError,
+    create_embedding_function,
     create_gemini_embedding_function,
     get_chroma_client,
     get_collection_count,
+    hybrid_retrieve_nutrition,
     index_nutrition_data,
     retrieve_nutrition_documents,
     sanitize_metadata_records,
@@ -26,14 +28,18 @@ from tests.conftest import FakeChromaClient
 def test_importing_embeddings_has_no_api_key_side_effect(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.delenv("API_KEY", raising=False)
     monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     mod = importlib.import_module("embeddings")
     importlib.reload(mod)
     assert hasattr(mod, "rag_query")
 
 
-def test_create_gemini_embedding_function_rejects_empty_key() -> None:
-    with pytest.raises(ValueError, match="GEMINI_API_KEY"):
+def test_create_embedding_function_rejects_empty_key() -> None:
+    with pytest.raises(ValueError, match="API_KEY"):
+        create_embedding_function("   ")
+
+    with pytest.raises(ValueError, match="API_KEY"):
         create_gemini_embedding_function("   ")
 
 
@@ -172,4 +178,53 @@ def test_real_chromadb_persistent_client_roundtrip(tmp_path: Path) -> None:
     retrieved = retrieve_nutrition_documents("nasi", client=client, embedding_function=ef, n_results=1)
     assert retrieved == ["Nasi Goreng has 250.0 calories"]
 
+
+def test_hybrid_retrieve_nutrition_merges_and_ranks(tmp_path: Path) -> None:
+    from services.database import save_nutrition_to_sqlite
+
+    client = FakeChromaClient()
+    collection = client.get_or_create_collection("nutrition")
+    collection.add(
+        documents=["Telur dadar mengandung energi 250.0 kkal..."],
+        metadatas=[{"name": "Telur dadar"}],
+        ids=["id-1"],
+    )
+
+    db_path = tmp_path / "hybrid_test.db"
+    df = pd.DataFrame(
+        [
+            {
+                "name": "Ayam goreng dada",
+                "calories": 290.0,
+                "proteins": 34.0,
+                "fat": 15.0,
+                "carbohydrate": 0.5,
+                "image": "",
+                "description": "Ayam goreng dada mengandung energi 290.0 kkal...",
+            },
+            {
+                "name": "Telur dadar",
+                "calories": 250.0,
+                "proteins": 15.0,
+                "fat": 19.0,
+                "carbohydrate": 1.0,
+                "image": "",
+                "description": "Telur dadar mengandung energi 250.0 kkal...",
+            },
+        ]
+    )
+    save_nutrition_to_sqlite(df, db_path)
+
+    # User searches specifically for dada ayam
+    results = hybrid_retrieve_nutrition(
+        query="Berapa kalori dada ayam?",
+        client=client,
+        embedding_function=lambda texts: [[0.1, 0.2] for _ in texts],
+        db_path=db_path,
+        n_results=2,
+    )
+
+    assert len(results) > 0
+    # The exact lexical match for dada ayam must rank first!
+    assert "Ayam goreng dada" in results[0]
 
