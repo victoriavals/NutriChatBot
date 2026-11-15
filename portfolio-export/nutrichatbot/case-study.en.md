@@ -10,15 +10,20 @@
 
 ## 1. Overview
 
-NutriChatBot is an intelligent, domain-specific nutrition and dietary planning assistant engineered to provide verified, culturally grounded nutritional intelligence for Indonesian dietary habits. Rather than relying on generic, ungrounded conversational language models, NutriChatBot integrates a **Dual-Engine Hybrid Retrieval-Augmented Generation (Hybrid RAG)** architecture backed by verified Indonesian food composition data (1,346 foods standard per 100g edible portion, adapted from official Ministry of Health / DKBM records).
+NutriChatBot is an intelligent, domain-specific nutrition and dietary planning assistant engineered to provide verified, culturally grounded nutritional intelligence for Indonesian dietary habits. Rather than relying on generic, ungrounded conversational language models, NutriChatBot integrates a **Dual-Engine Hybrid Retrieval-Augmented Generation (Hybrid RAG)** architecture backed by a tri-faceted data ecosystem:
+- **1,346 Baseline Food Composition Records (DKBM Kemenkes RI):** Standard per 100g edible portion (BDD) laboratory nutritional values.
+- **60 FMCG Packaged Consumer Goods (Open Food Facts & BPOM):** Popular supermarket retail foods (Indomie, Ultra Milk, Bear Brand, Roma, Quaker) complete with Sugar, Saturated Fat, Sodium, and international **Nutri-Score (Grade A–E)** ratings.
+- **30 Authentic Indonesian Regional Recipes:** Culturally authentic regional dishes with standard portioning, measured ingredients, step-by-step cooking steps, and verified per-serving macro profiles.
+- **Household Serving Size (URT) Translation Engine:** Translates abstract 100-gram values into intuitive everyday Indonesian kitchen servings (*rice cooker scoops / centong*, *eggs / butir*, *pieces / potong*, *tablespoons / sdm*).
 
 Crucially, the system combines rigorous algorithmic retrieval with a **User-Centered Design (UCD)** interface specifically engineered for **everyday laypersons** (home cooks, students, fitness beginners, and elderly users). By eliminating technical jargon, overcoming "blank-canvas" prompt paralysis through interactive suggestion chips, and automating metabolic math into plain-language visual takeaways, NutriChatBot bridges advanced AI engineering with accessible consumer healthcare usability.
 
 Core capabilities include:
-- **Tanya Gizi:** Conversational nutritional Q&A with token streaming, interactive prompt chips, and context citation expanders.
+- **Tanya Gizi:** Conversational nutritional Q&A with token streaming, interactive prompt chips, context citation expanders, and one-click household serving size (URT) calculator.
 - **Perencana Menu Mingguan:** Personalized 7-day meal planning driven by the clinically validated Mifflin-St Jeor metabolic expenditure equation, complete with intuitive BMI categorization and "Isi Piringku" macro visualization.
-- **Bandingkan Makanan:** Side-by-side macronutrient analytics powered by Altair visualization and automated "Quick Takeaway" nutritional winners.
-- **Masak Apa Hari Ini?:** Pantry-ingredient recipe synthesizer with one-click ingredient combo chips and clinical disease constraint filters (e.g., low-sodium for hypertension, low-sugar for diabetes).
+- **Bandingkan Makanan:** Side-by-side macronutrient analytics powered by Altair visualization, automated "Quick Takeaway" nutritional winners, and URT portion scaling.
+- **Masak Apa Hari Ini?:** Pantry-ingredient recipe synthesizer matching real pantry items to authentic regional dishes, augmented with AI personalized modifications and clinical disease constraint filters.
+- **Produk Kemasan & Nutri-Score:** Consumer retail product directory with official BPOM nutritional facts (Sugars, Saturated Fat, Sodium) and official Nutri-Score grading (Grade A through E).
 - **Alternatif Sehat:** Healthier ingredient substitution finder with one-click popular ingredient chips.
 
 ---
@@ -39,6 +44,9 @@ Public access to accurate, actionable nutritional information in Indonesia faces
 As the primary author and engineer, Naufal Firdaus conceptualized, implemented, and verified the entire technical lifecycle of NutriChatBot:
 
 - **Hybrid Retrieval Architecture:** Designed and implemented the Weighted Reciprocal Rank Fusion ($wRRF$) algorithm in `services/embeddings.py`, harmonizing dense vector similarity from ChromaDB (`text-embedding-3-small`) with lexical substring/token matching from SQLite.
+- **Household Serving Size (URT) Translation Engine:** Developed `services/serving_size.py`, mapping Indonesian food taxonomy to convert abstract 100g laboratory metrics into intuitive kitchen portion units (*rice cooker scoops / centong*, *eggs / butir*, *pieces / potong*, *plates / piring*, *tablespoons / sdm*).
+- **Curated FMCG Retail Database & Nutri-Score Integration:** Built the `packaged_nutrition` database containing 60 popular supermarket consumer goods with official BPOM facts (Sugars, Saturated Fat, Sodium) and international Nutri-Score grading (Grade A through E).
+- **Authentic Indonesian Regional Recipe Library:** Engineered `services/recipe_service.py` and the `recipes` database containing 30 authentic regional culinary recipes with ingredient matching algorithms and verified per-serving macro profiles.
 - **Metabolic Calculation Engine:** Developed `services/nutrition_calc.py`, implementing the Mifflin-St Jeor Basal Metabolic Rate (BMR) and Total Daily Energy Expenditure (TDEE) formula, complete with rigorous physical bounds validation and macronutrient calorie-ratio distribution.
 - **User-Centered Interface & Ergonomics:** Engineered an accessible design system in `app.py`:
   - Injected custom CSS for streamlined container spacing, responsive metric cards, and tactile pill buttons.
@@ -46,7 +54,7 @@ As the primary author and engineer, Naufal Firdaus conceptualized, implemented, 
   - Relegated developer diagnostic telemetry into a collapsible expander drawer, prioritizing a clean, welcoming assistant status for everyday consumers.
   - Implemented automated comparative takeaways in food analysis to deliver instant nutritional insights without requiring users to do mental math.
 - **Safety & Guardrails Engineering:** Engineered the clinical comorbidity detection pipeline in `services/llm.py` to intercept high-risk terms (diabetes, ginjal, hipertensi, asam urat) and automatically inject clinical warnings. Implemented the `SensitiveDataFilter` logging filter in `config.py` to prevent credential exposure.
-- **Testing & Production Readiness:** Established a 51-test automated suite across unit, integration, and UI testing tiers, reaching 100% pass rates, accompanied by multi-stage Docker containerization and GitHub Actions CI.
+- **Testing & Production Readiness:** Established a 68-test automated suite across unit, integration, and UI testing tiers, reaching 100% pass rates, accompanied by multi-stage Docker containerization, Streamlit Community Cloud public deployment, and GitHub Actions CI.
 
 ---
 
@@ -75,12 +83,15 @@ Integrated SumoPod AI's OpenAI-compatible endpoint hosting `glm-5.3-flash`. Resp
 Implemented custom `logging.Filter` subclasses (`SensitiveDataFilter`) that scan log messages and variable arguments against compiled regular expressions `(AIza[0-9A-Za-z_\-]{10,}|sk-[0-9A-Za-z_\-]{10,})`. Any matched API token is instantly replaced with `[REDACTED_API_KEY]`, ensuring security in stdout and container log aggregation.
 
 ### E. Comprehensive Verification Pyramid
-Built 51 automated test cases spanning:
+Built 68 automated test cases spanning:
 - Biometric boundary checks and numerical integrity.
 - SQL injection resistance with parameterized queries.
-- Database idempotency and anomaly detection.
+- Multi-table database idempotency and anomaly detection (baseline foods, FMCG, and recipes).
+- Household Serving Size (URT) scaling factors and taxonomy resolution.
+- FMCG Nutri-Score and BPOM macro calculation accuracy.
+- Authentic regional recipe matching by pantry ingredients.
 - Embedding sanitization (handling `NaN`, `Inf`, and numpy arrays).
-- UI state transitions and error fallbacks via Streamlit `AppTest`.
+- UI state transitions across all 7 views via Streamlit `AppTest`.
 
 ---
 
@@ -95,7 +106,7 @@ The NutriChatBot system follows a modular 5-tier architecture:
 |  - Custom CSS Design Tokens & Rounded Metric Cards                                |
 |  - One-Click Prompt & Recipe Suggestion Chips (Eliminating Blank Canvas)          |
 |  - Dedicated Developer Telemetry Drawer (Separated from Layperson UI)             |
-|  [Tanya Gizi]   [Masak Apa Hari Ini]   [Perencana Menu]   [Bandingkan Makanan]     |
+|  [Tanya Gizi] [Masak Apa] [Perencana Menu] [Bandingkan] [Produk Kemasan] [Alternatif]
 +------------------------------------------+----------------------------------------+
                                            | User Query & Biometrics
                                            v
@@ -135,9 +146,12 @@ The NutriChatBot system follows a modular 5-tier architecture:
                                         v
 +-----------------------------------------------------------------------------------+
 |                        5. PERSISTENT STORAGE & DATA                               |
-|  - SQLite (nutrition.db): 1,346 structured Indonesian food nutrient records       |
+|  - SQLite (nutrition.db): Multi-table schema                                      |
+|    * `nutrition`: 1,346 structured baseline Indonesian foods (DKBM)               |
+|    * `packaged_nutrition`: 60 FMCG products with BPOM & Nutri-Score (Grade A–E)   |
+|    * `recipes`: 30 authentic regional recipes with verified serving nutrition     |
 |  - ChromaDB (/chroma): DuckDB/Parquet vector indices with descriptive metadata    |
-|  - Raw Source (data/nutrition.csv): Standardized 100g edible portion benchmarks   |
+|  - Raw CSV Sources (data/nutrition.csv, packaged_nutrition.csv, recipes.csv)      |
 +-----------------------------------------------------------------------------------+
 ```
 
@@ -147,11 +161,13 @@ The NutriChatBot system follows a modular 5-tier architecture:
 
 ### Modular Codebase Organization
 - `config.py`: Centralized configuration, dataclasses (`AppSettings`), environment loading from `.env`, constants, and the `SensitiveDataFilter`.
-- `services/database.py`: Handles CSV validation, anomaly detection for macro-energy plausibility ($|4P + 4C + 9F - Calories| > 50$), SQLite schema management, and ranked keyword search.
+- `services/database.py`: Handles CSV validation, anomaly detection for macro-energy plausibility ($|4P + 4C + 9F - Calories| > 50$), multi-table SQLite schema management (`nutrition`, `packaged_nutrition`, `recipes`), and ranked keyword search.
+- `services/serving_size.py`: Defines `ServingOption` dataclass, taxonomy mappings for Indonesian household serving units (*centong*, *butir*, *potong*, *piring*, *sdm*), and macro scaling proportional calculators.
+- `services/recipe_service.py`: Pantry-ingredient matching engine against 30 authentic Indonesian dishes, computing ingredient coverage scores and synthesizing healthy cooking adaptation prompts.
 - `services/embeddings.py`: Factory functions for OpenAI-compatible embeddings, ChromaDB client management, batch ingestion with `NaN` sanitization, and the `hybrid_retrieve_nutrition` fusion engine.
 - `services/nutrition_calc.py`: Pure mathematical service computing Mifflin-St Jeor equations, activity factor multipliers, BMI categorization, and macro splits.
 - `services/llm.py`: Prompt synthesis, clinical comorbidity interception, and token streaming generators for Q&A, recipes, weekly plans, and alternatives.
-- `app.py`: Streamlit entrypoint coordinating UI styling (`_inject_custom_styles`), interactive chips state-hydration, Altair charting, and layperson-friendly result interpretation.
+- `app.py`: Streamlit entrypoint coordinating UI styling (`_inject_custom_styles`), interactive chips state-hydration, Altair charting, FMCG Nutri-Score directory, and layperson-friendly navigation across all 7 views.
 
 ### Core Mathematical Formulae
 
@@ -181,6 +197,9 @@ $$\text{TDEE} = \text{BMR} \times \text{Activity Multiplier}$$
 | **SumoPod AI + GLM-5.3-flash** | Direct Google Gemini or OpenAI GPT-4o | SumoPod AI provides high-availability OpenAI-compatible endpoints with GLM-5.3-flash, offering superior reasoning throughput at lower operational costs, verified via local streaming tests. |
 | **Mifflin-St Jeor Standard** | Harris-Benedict (1919) | The American Dietetic Association (ADA) confirmed Mifflin-St Jeor is significantly more accurate (within 10% of measured RMR in over 82% of individuals) compared to Harris-Benedict, which overestimates BMR by up to 15%. |
 | **Local SQLite + ChromaDB** | Managed Cloud Database (Pinecone / Supabase) | Eliminates external latency and cloud hosting costs for the 1,346-item dataset, enabling completely offline, reproducible local development and containerized portability. |
+| **Household Serving Size (URT) Engine** | Pure Gram Weighting | Laypersons eat in practical portions (*rice scoops, eggs, pieces*), not abstract 100-gram laboratory increments. Translating 100g data into URT eliminates mental math and prevents dangerous portion estimation errors. |
+| **Curated FMCG & Nutri-Score (BPOM)** | Fresh Raw Food Exclusively | Modern Indonesian diets heavily involve packaged retail foods. Integrating 60 popular supermarket items with BPOM sugar/salt metrics and international Nutri-Score grades (A–E) provides holistic dietary awareness. |
+| **Authentic Regional Recipe Library** | 100% Unanchored LLM Generation | Unanchored LLMs often hallucinate seasonings or portion sizes for traditional regional recipes. Pairing pantry search with 30 authentic regional recipes guarantees cultural authenticity and verified nutritional breakdowns. |
 | **Streamlit Community Cloud Deployment** | Self-hosted VPS / AWS EC2 | Provides zero-cost public hosting with direct continuous deployment from GitHub `main` branch, featuring secure UI-based secrets management without infrastructure maintenance overhead. |
 | **Streamlit Testing (`AppTest`)** | Headless Selenium / Playwright | Streamlit's native `AppTest` enables sub-second headless execution of complete UI state machines inside standard `pytest` without spinning up heavyweight browser processes. |
 
@@ -209,4 +228,4 @@ The implementation has been verified through multiple rigorous testing layers:
 
 - **Local Verification Scope:** All tests and benchmarks have been executed in verified local environments and containerized workflows. Real-world public multi-tenant concurrency and production telemetry have not been assessed.
 - **Medical Disclaimer Boundary:** NutriChatBot is explicitly an educational dietary assistant, not a licensed medical diagnostic tool. All dietary suggestions and recipes include prominent medical disclaimers urging users with chronic medical conditions to consult a registered clinical dietitian (Sp.GK / RD).
-- **Dataset Coverage:** The dataset is bounded to 1,346 foods from standard Indonesian food tables (DKBM). Packaged ultra-processed commercial foods with proprietary barcodes are outside the current database scope.
+- **Dataset Coverage:** The structured database integrates 1,346 baseline foods from standard Indonesian food tables (DKBM), 60 popular supermarket consumer goods (FMCG) with BPOM facts and Nutri-Scores, and 30 authentic regional recipes. Tens of thousands of specialized packaged barcodes across Indonesian supermarkets remain outside the local database scope and are subject to future API expansion.
