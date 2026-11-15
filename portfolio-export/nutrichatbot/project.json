@@ -9,8 +9,8 @@
     "id": "Asisten Gizi & Kesehatan Berbasis AI / Generative RAG"
   },
   "summary": {
-    "en": "Production-grade nutritional assistant combining dense ChromaDB embeddings and lexical SQLite search via Weighted Reciprocal Rank Fusion, powering verified dietary advice and Mifflin-St Jeor metabolic calculations via GLM-5.3-flash reasoning.",
-    "id": "Asisten nutrisi teruji yang memadukan pencarian semantik ChromaDB dan leksikal SQLite melalui Weighted Reciprocal Rank Fusion, menghadirkan saran gizi berbasis data resmi pangan dan kalkulator metabolik Mifflin-St Jeor dengan penalaran GLM-5.3-flash."
+    "en": "Production-grade nutritional assistant combining dense ChromaDB embeddings and lexical SQLite search via Weighted Reciprocal Rank Fusion, powering verified dietary advice, layperson-friendly UI/UX chips, and Mifflin-St Jeor calculations via GLM-5.3-flash reasoning.",
+    "id": "Asisten nutrisi teruji yang memadukan pencarian semantik ChromaDB dan leksikal SQLite melalui Weighted Reciprocal Rank Fusion, menghadirkan saran gizi berbasis data resmi pangan, UI/UX ramah pengguna awam, dan kalkulator Mifflin-St Jeor dengan penalaran GLM-5.3-flash."
   },
   "coverAsset": "01-tanya-gizi-chat.webp",
   "stack": [
@@ -23,29 +23,33 @@
     "Docker"
   ],
   "problem": {
-    "en": "General-purpose LLMs frequently hallucinate nutritional values and lack contextual knowledge of authentic Indonesian dietary staples (DKBM data), while users lack accessible tools for calculating clinically sound BMR/TDEE metabolic targets with medical safety guardrails.",
-    "id": "LLM umum kerap mengalami halusinasi pada data takaran nutrisi dan minim memahami komposisi bahan pangan lokal Indonesia (DKBM), sementara masyarakat kekurangan alat terpadu untuk menghitung target metabolik BMR/TDEE berbasis standar klinis yang dilengkapi batasan keselamatan medis."
+    "en": "General-purpose LLMs frequently hallucinate nutritional values and lack contextual knowledge of authentic Indonesian dietary staples (DKBM data), while everyday laypersons struggle with blank-canvas chat paralysis, lack understanding of metabolic math (BMR/TDEE), and face safety risks without medical guardrails.",
+    "id": "LLM umum kerap mengalami halusinasi pada data takaran nutrisi dan minim memahami komposisi bahan pangan lokal Indonesia (DKBM), sementara masyarakat awam kerap bingung saat berhadapan dengan chat kosong (blank-canvas), kesulitan memahami rumus kalori (BMR/TDEE), serta rentan terhadap anjuran diet tanpa batasan keselamatan medis."
   },
   "personalContribution": {
-    "en": "Designed and engineered the end-to-end architecture: implemented the Dual-Engine Hybrid RAG with Weighted Reciprocal Rank Fusion (wRRF), integrated Mifflin-St Jeor metabolic formula, implemented medical risk detection guardrails and log redaction filters, refactored the multi-turn Streamlit conversational UI, and established 100% passing automated test coverage with GitHub Actions CI.",
-    "id": "Merancang dan membangun arsitektur menyeluruh: mengimplementasikan Hybrid RAG Dual-Engine dengan Weighted Reciprocal Rank Fusion (wRRF), mengintegrasikan kalkulator metabolik formula Mifflin-St Jeor, membangun guardrail deteksi risiko medis dan filter redaksi log sensitif, merekayasa antarmuka percakapan streaming Streamlit, serta mendirikan cakupan pengujian otomatis berstatus 100% lulus pada GitHub Actions CI."
+    "en": "Designed and engineered the end-to-end architecture: implemented the Dual-Engine Hybrid RAG with Weighted Reciprocal Rank Fusion (wRRF), integrated the Mifflin-St Jeor metabolic formula, implemented medical risk detection guardrails and log redaction filters, designed user-centered UI/UX interactions for non-technical users (interactive prompt chips, quick comparative takeaways, BMI visual badges, and separated developer observability), refactored the multi-turn Streamlit conversational UI, and established 100% passing automated test coverage with GitHub Actions CI.",
+    "id": "Merancang dan membangun arsitektur menyeluruh: mengimplementasikan Hybrid RAG Dual-Engine dengan Weighted Reciprocal Rank Fusion (wRRF), mengintegrasikan kalkulator metabolik formula Mifflin-St Jeor, membangun guardrail deteksi risiko medis dan filter redaksi log sensitif, merekayasa antarmuka UI/UX ramah pengguna awam (chip pertanyaan cepat, ringkasan perbandingan gizi instan, lencana status BMI, pemisahan telemetri teknis), serta mendirikan cakupan pengujian otomatis berstatus 100% lulus pada GitHub Actions CI."
   },
   "engineeringFocus": {
-    "en": "Dual-engine hybrid retrieval with Weighted Reciprocal Rank Fusion (wRRF) fusing vector cosine distance and lexical rank scoring; real-time streaming token generation; strict regex-based sensitive credential redaction; comprehensive 51-test verification pyramid.",
-    "id": "Hybrid retrieval dual-engine dengan Weighted Reciprocal Rank Fusion (wRRF) yang menyatukan jarak kosinus vektor dan pemeringkatan leksikal; inferensi streaming token real-time; redaksi kredensial sensitif berbasis regex nir-bocor; serta piramida verifikasi 51 uji otomatis."
+    "en": "Dual-engine hybrid retrieval with Weighted Reciprocal Rank Fusion (wRRF) fusing vector cosine distance and lexical rank scoring; real-time streaming token generation; user-centered UX engineering overcoming blank-canvas cognitive friction for laypersons; strict regex-based sensitive credential redaction; comprehensive 51-test verification pyramid.",
+    "id": "Hybrid retrieval dual-engine dengan Weighted Reciprocal Rank Fusion (wRRF) yang menyatukan jarak kosinus vektor dan pemeringkatan leksikal; inferensi streaming token real-time; rekayasa UX ramah pengguna awam yang menghilangkan friksi kanvas kosong; redaksi kredensial sensitif berbasis regex nir-bocor; serta piramida verifikasi 51 uji otomatis."
   },
   "architecture": {
-    "en": "Layered architecture comprising Streamlit Web UI, Guardrails & Preprocessing Engine, Dual-Engine Retrieval Pipeline (Dense Semantic via ChromaDB + Lexical Ranked via SQLite), Weighted Reciprocal Rank Fusion Re-ranking, and SumoPod AI GLM-5.3-flash Streaming Inference.",
-    "id": "Arsitektur berlapis yang terdiri atas Streamlit Web UI, Engine Guardrail & Pra-pemrosesan, Pipeline Retrieval Dual-Engine (Semantik Dense via ChromaDB + Leksikal Terurut via SQLite), Pemeringkatan Ulang Weighted Reciprocal Rank Fusion, dan Inferensi Streaming SumoPod AI GLM-5.3-flash."
+    "en": "Layered architecture comprising Streamlit Web UI with Custom CSS, Guardrails & Preprocessing Engine, Dual-Engine Retrieval Pipeline (Dense Semantic via ChromaDB + Lexical Ranked via SQLite), Weighted Reciprocal Rank Fusion Re-ranking, and SumoPod AI GLM-5.3-flash Streaming Inference.",
+    "id": "Arsitektur berlapis yang terdiri atas Streamlit Web UI dengan Custom CSS, Engine Guardrail & Pra-pemrosesan, Pipeline Retrieval Dual-Engine (Semantik Dense via ChromaDB + Leksikal Terurut via SQLite), Pemeringkatan Ulang Weighted Reciprocal Rank Fusion, dan Inferensi Streaming SumoPod AI GLM-5.3-flash."
   },
   "implementation": {
-    "en": "Built on Python 3.12 with clean service separation: services/database.py for parameterized SQLite queries, services/embeddings.py for text-embedding-3-small and ChromaDB vector operations, services/nutrition_calc.py for validated Mifflin-St Jeor math, services/llm.py for streaming GLM inference with safety guardrails, and app.py for multi-view Streamlit UI.",
-    "id": "Dibangun di atas Python 3.12 dengan pemisahan modul yang rapi: services/database.py untuk kueri berparameter SQLite, services/embeddings.py untuk text-embedding-3-small dan ChromaDB, services/nutrition_calc.py untuk validasi formula Mifflin-St Jeor, services/llm.py untuk inferensi streaming GLM dengan guardrail medis, dan app.py untuk antarmuka multi-tampilan Streamlit."
+    "en": "Built on Python 3.12 with clean service separation: services/database.py for parameterized SQLite queries, services/embeddings.py for text-embedding-3-small and ChromaDB vector operations, services/nutrition_calc.py for validated Mifflin-St Jeor math, services/llm.py for streaming GLM inference with safety guardrails, and app.py for multi-view Streamlit UI featuring accessible prompt chips and custom design tokens.",
+    "id": "Dibangun di atas Python 3.12 dengan pemisahan modul yang rapi: services/database.py untuk kueri berparameter SQLite, services/embeddings.py untuk text-embedding-3-small dan ChromaDB, services/nutrition_calc.py untuk validasi formula Mifflin-St Jeor, services/llm.py untuk inferensi streaming GLM dengan guardrail medis, dan app.py untuk antarmuka multi-tampilan Streamlit yang dilengkapi chip pertanyaan cepat dan token desain kustom."
   },
   "technicalDecisions": [
     {
       "decision": "Hybrid Retrieval with Weighted Reciprocal Rank Fusion (wRRF)",
       "rationale": "Pure vector search struggles with exact Indonesian culinary naming (e.g., 'Beras giling merah' vs 'Beras ketan'), while pure keyword search fails on semantic queries (e.g., 'makanan tinggi protein rendah lemak'). wRRF with k=60 achieves the optimal balance of precision and recall."
+    },
+    {
+      "decision": "User-Centered Design (UCD) with Quick Prompt Chips & Separated Developer Drawer",
+      "rationale": "Laypersons frequently experience decision paralysis when facing a blank text input, while developer metrics (model IDs, embedding dimensions, vector counts) create visual clutter. Embedding interactive quick-action chips and relegating technical metrics to an expander drawer drastically lowers cognitive barriers while maintaining system observability."
     },
     {
       "decision": "SumoPod AI Gateway with GLM-5.3-flash Model",
