@@ -11,7 +11,10 @@ import pandas as pd
 
 from config import (
     CHROMA_COLLECTION_NAME,
+    DEFAULT_BASE_URL,
     DEFAULT_CHROMA_PATH,
+    DEFAULT_DB_PATH,
+    DEFAULT_EMBEDDING_MODEL,
     DEFAULT_RAG_RESULTS,
     EMBEDDING_BATCH_SIZE,
     get_logger,
@@ -41,24 +44,43 @@ def ensure_pysqlite3() -> bool:
         return False
 
 
-def create_gemini_embedding_function(api_key: str) -> Any:
-    """Lazily create a ChromaDB Google Generative AI embedding function.
+def create_embedding_function(
+    api_key: str,
+    base_url: str = DEFAULT_BASE_URL,
+    model_name: str = DEFAULT_EMBEDDING_MODEL,
+) -> Any:
+    """Lazily create a ChromaDB embedding function using OpenAI/SumoPod compatible endpoint.
 
     Args:
-        api_key: Non-empty Gemini API key.
+        api_key: Non-empty API key.
+        base_url: Base URL for OpenAI-compatible embeddings (e.g. https://ai.sumopod.com/v1).
+        model_name: Name of the embedding model (e.g. text-embedding-3-small).
 
     Returns:
-        Configured GoogleGenerativeAiEmbeddingFunction instance.
+        Configured OpenAIEmbeddingFunction instance.
 
     Raises:
         ValueError: If api_key is empty.
     """
     if not api_key or not api_key.strip():
-        raise ValueError("GEMINI_API_KEY tidak boleh kosong untuk inisialisasi embedding.")
+        raise ValueError("API_KEY tidak boleh kosong untuk inisialisasi embedding.")
 
     from chromadb.utils import embedding_functions
 
-    return embedding_functions.GoogleGenerativeAiEmbeddingFunction(api_key=api_key.strip())
+    return embedding_functions.OpenAIEmbeddingFunction(
+        api_key=api_key.strip(),
+        api_base=base_url,
+        model_name=model_name,
+    )
+
+
+def create_gemini_embedding_function(
+    api_key: str,
+    base_url: str = DEFAULT_BASE_URL,
+    model_name: str = DEFAULT_EMBEDDING_MODEL,
+) -> Any:
+    """Backward-compatible alias for create_embedding_function."""
+    return create_embedding_function(api_key=api_key, base_url=base_url, model_name=model_name)
 
 
 def get_chroma_client(chroma_path: str | Path = DEFAULT_CHROMA_PATH) -> Any:
@@ -213,8 +235,11 @@ def retrieve_nutrition_documents(
     embedding_function: Any,
     collection_name: str = CHROMA_COLLECTION_NAME,
     n_results: int = DEFAULT_RAG_RESULTS,
+    db_path: str | Path | None = None,
 ) -> list[str]:
     """Retrieve top-N semantically similar nutrition descriptions from ChromaDB.
+
+    If db_path is provided, utilizes Hybrid Search (RRF of lexical + dense ranking).
 
     Args:
         query: User's nutrition question.
@@ -222,6 +247,7 @@ def retrieve_nutrition_documents(
         embedding_function: Configured embedding function matching the collection.
         collection_name: Target ChromaDB collection name.
         n_results: Maximum number of contexts to retrieve.
+        db_path: Optional path to SQLite database for hybrid lexical matching.
 
     Returns:
         List of matching nutrition description strings.
@@ -232,6 +258,16 @@ def retrieve_nutrition_documents(
     cleaned_query = query.strip()
     if not cleaned_query:
         return []
+
+    if db_path is not None:
+        return hybrid_retrieve_nutrition(
+            query=cleaned_query,
+            client=client,
+            embedding_function=embedding_function,
+            db_path=db_path,
+            collection_name=collection_name,
+            n_results=n_results,
+        )
 
     try:
         collection = client.get_collection(
@@ -268,4 +304,85 @@ def retrieve_nutrition_documents(
                 if isinstance(doc, str) and doc.strip():
                     documents.append(doc)
     return documents
+
+
+def hybrid_retrieve_nutrition(
+    query: str,
+    client: Any,
+    embedding_function: Any,
+    db_path: str | Path = DEFAULT_DB_PATH,
+    collection_name: str = CHROMA_COLLECTION_NAME,
+    n_results: int = DEFAULT_RAG_RESULTS,
+    rrf_k: int = 60,
+) -> list[str]:
+    """Retrieve top-N nutrition documents using Reciprocal Rank Fusion of Dense and Sparse searches.
+
+    Combines:
+    1. Lexical ranking from SQLite (via search_nutrition_keyword_ranked)
+    2. Dense semantic vector ranking from ChromaDB (via collection.query)
+
+    Args:
+        query: User's nutrition question or keyword.
+        client: Active ChromaDB client.
+        embedding_function: Configured embedding function.
+        db_path: Path to SQLite database.
+        collection_name: Target ChromaDB collection name.
+        n_results: Maximum number of merged documents to return.
+        rrf_k: Constant for Reciprocal Rank Fusion formula (default 60).
+
+    Returns:
+        List of ranked, deduplicated nutrition description strings.
+    """
+    cleaned_query = query.strip()
+    if not cleaned_query:
+        return []
+
+    from services.database import DatabaseError, search_nutrition_keyword_ranked
+
+    # 1. Lexical Candidates from SQLite
+    try:
+        lexical_limit = max(n_results * 3, 10)
+        lexical_items = search_nutrition_keyword_ranked(cleaned_query, db_path=db_path, limit=lexical_limit)
+    except (DatabaseError, OSError, ValueError) as exc:
+        logger.warning("Lexical search in hybrid retrieval failed: %s", exc)
+        lexical_items = []
+
+    # 2. Dense Candidates from ChromaDB
+    dense_docs: list[str] = []
+    recoverable_dense = _chroma_recoverable_errors()
+    try:
+        collection = client.get_collection(name=collection_name, embedding_function=embedding_function)
+        doc_count = int(collection.count())
+        if doc_count > 0:
+            dense_limit = max(1, min(n_results * 3, doc_count))
+            res = collection.query(query_texts=[cleaned_query], n_results=dense_limit)
+            raw_docs = res.get("documents") if isinstance(res, dict) else None
+            if raw_docs:
+                for group in raw_docs:
+                    for doc in group:
+                        if isinstance(doc, str) and doc.strip():
+                            dense_docs.append(doc.strip())
+    except recoverable_dense as exc:
+        logger.warning("Dense search in hybrid retrieval failed: %s", exc)
+
+
+    # If neither returned anything, raise error so caller can handle gracefully
+    if not lexical_items and not dense_docs:
+        raise EmbeddingServiceError("Tidak ditemukan konteks nutrisi untuk pertanyaan tersebut.")
+
+    # 3. Reciprocal Rank Fusion (RRF)
+    rrf_scores: dict[str, float] = {}
+
+    for rank, item in enumerate(lexical_items):
+        desc = str(item.get("description", "")).strip()
+        weight = float(item.get("_match_weight", 2.0))
+        if desc:
+            rrf_scores[desc] = rrf_scores.get(desc, 0.0) + (weight / (rrf_k + rank + 1))
+
+    for rank, doc in enumerate(dense_docs):
+        if doc:
+            rrf_scores[doc] = rrf_scores.get(doc, 0.0) + (1.0 / (rrf_k + rank + 1))
+
+    sorted_docs = sorted(rrf_scores.keys(), key=lambda d: rrf_scores[d], reverse=True)
+    return sorted_docs[:n_results]
 
