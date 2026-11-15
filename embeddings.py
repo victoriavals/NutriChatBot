@@ -12,7 +12,7 @@ import pandas as pd
 
 from config import CHROMA_COLLECTION_NAME, DEFAULT_RAG_RESULTS, load_settings
 from services.embeddings import (
-    create_gemini_embedding_function,
+    create_embedding_function,
     get_chroma_client,
 )
 from services.embeddings import (
@@ -24,13 +24,22 @@ from services.llm import answer_nutrition_question
 def _resolve_embedding_function(
     embedding_function: Any | None = None,
     api_key: str | None = None,
+    base_url: str | None = None,
+    model_name: str | None = None,
 ) -> Any:
     """Resolve an embedding function lazily without crashing on module import."""
     if embedding_function is not None:
         return embedding_function
-    resolved_key = api_key or load_settings(require_api_key=True).gemini_api_key
+    settings = load_settings(require_api_key=api_key is None)
+    resolved_key = api_key or settings.api_key
     assert resolved_key is not None
-    return create_gemini_embedding_function(resolved_key)
+    resolved_url = base_url or settings.base_url
+    resolved_model = model_name or settings.model_embedding
+    return create_embedding_function(
+        api_key=resolved_key,
+        base_url=resolved_url,
+        model_name=resolved_model,
+    )
 
 
 def index_nutrition_data(
